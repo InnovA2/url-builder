@@ -1,0 +1,53 @@
+{
+  "name": "@innova2/url-builder",
+  "version": "0.1.0",
+  "description": "A lightweight library with many feature to easy build URLs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "test": "jest",
+    "test:cov": "jest --coverage && make-coverage-badge"
+  },
+  "dependencies": {
+    "url-parse": "^1.5.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.22",
+    "jest": "^26.6.3",
+    "make-coverage-badge": "^1.2.0",
+    "ts-jest": "^26.5.4",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  },
+  "keywords": [
+    "url",
+    "uri",
+    "path",
+    "route",
+    "routing",
+    "build",
+    "builder",
+    "url-builder",
+    "urlbuilder",
+    "construct",
+    "concat",
+    "query",
+    "queryparam",
+    "params",
+    "parse",
+    "string"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InnovA2/url-builder.git"
+  },
+  "author": "Angéline Toussaint & Adrien Martineau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/InnovA2/url-builder/issues"
+  },
+  "homepage": "https://github.com/InnovA2/url-builder#readme"
+}
