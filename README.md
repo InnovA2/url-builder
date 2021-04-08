@@ -18,6 +18,7 @@ A lightweight library with many features to easy build URLs
   - [Get word between two others](#get-word-between-two-others)
   - [Split path from string (static)](#split-path-from-string-static)
   - [Trim path from string (static)](#trim-path-from-string-static)
+- [API](#gear-api)
 - [Licence](#balance_scale-licence)
 - [Authors](#busts_in_silhouette-authors)
 - [Contributors](#handshake-contributors)
@@ -32,7 +33,7 @@ This library allows :
 ## :hammer_and_wrench: Installation
 To import the library you just need to run this command :
 ```shell
-npm intall @innova2/url-builder
+npm install @innova2/url-builder
 ```
 
 ## :memo: Usage
@@ -163,6 +164,29 @@ UrlBuilder.trimPath('/InnovA2/url-builder/pulls/'); // Output: 'InnovA2/url-buil
 UrlBuilder.trimPath('/InnovA2///url-builder/pulls/'); // Output: 'InnovA2/url-builder/pulls'
 ```
     
+## :gear: API
+```ts
+static createFromUrl(baseUrl: string): UrlBuilder
+static splitPath(path: string): string[]
+static trimPath(path: string): string
+compareTo(url: UrlBuilder, relative = true): boolean
+setPort(port: number): UrlBuilder
+addPath(path: string): UrlBuilder
+addParam(key: string, value: string | number): UrlBuilder
+addParams(params: Record<string, string | number>): UrlBuilder
+getParams(): Map<string, string | number>
+addQuery(key: string, value: string | number): UrlBuilder
+addQueries(queries: Record<string, string | number>): UrlBuilder
+getQuery(): Map<string, string | number>
+getFirstPath(): string
+getLastPath(): string
+getParent(n = 1): UrlBuilder
+getBetween2Words(a: string, b: string): string
+getRelativePath(query = false): string
+getQueryString(): string
+toString(): string
+```
+
 ## :balance_scale: Licence
 [MIT](LICENSE)
 
