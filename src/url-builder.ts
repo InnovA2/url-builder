@@ -5,7 +5,7 @@ export class UrlBuilder {
     private scheme = Scheme.HTTPS;
     private host: string;
     private port: number;
-    private paths: string[] = [];
+    private pathSegments: string[] = [];
     private params = new Map<string, string | number>();
     private query = new Map<string, string | number>();
 
@@ -24,7 +24,7 @@ export class UrlBuilder {
             url.port = +items.port;
         }
 
-        url.paths = this.splitPath(items.pathname);
+        url.pathSegments = this.splitPath(items.pathname);
 
         if (items.query) {
             for (const [key, value] of Object.entries(items.query)) {
@@ -47,13 +47,53 @@ export class UrlBuilder {
         return (relative && url.getRelativePath() === this.getRelativePath()) || (!relative && url.toString() === this.toString());
     }
 
+    getScheme(): Scheme {
+        return this.scheme;
+    }
+
+    setScheme(scheme: Scheme): UrlBuilder {
+        this.scheme = scheme;
+        return this;
+    }
+
+    getHost(): string {
+        return this.host;
+    }
+
+    setHost(host: string): UrlBuilder {
+        this.host = host;
+        return this;
+    }
+
+    getPort(): number {
+        return this.port;
+    }
+
     setPort(port: number): UrlBuilder {
         this.port = port;
         return this;
     }
 
+    getPathSegments(): string[] {
+        return this.pathSegments;
+    }
+
+    setPathSegments(segments: string[]): UrlBuilder {
+        this.pathSegments = segments;
+        return this;
+    }
+
     addPath(path: string): UrlBuilder {
-        this.paths.push(...UrlBuilder.splitPath(path));
+        this.pathSegments.push(...UrlBuilder.splitPath(path));
+        return this;
+    }
+
+    getParams(): Map<string, string | number> {
+        return this.params;
+    }
+
+    setParams(params: Map<string, string | number>): UrlBuilder {
+        this.params = params;
         return this;
     }
 
@@ -69,8 +109,13 @@ export class UrlBuilder {
         return this;
     }
 
-    getParams(): Map<string, string | number> {
-        return this.params;
+    getQuery(): Map<string, string | number> {
+        return this.query;
+    }
+
+    setQuery(query: Map<string, string | number>): UrlBuilder {
+        this.query = query;
+        return this;
     }
 
     addQuery(key: string, value: string | number): UrlBuilder {
@@ -85,23 +130,19 @@ export class UrlBuilder {
         return this;
     }
 
-    getQuery(): Map<string, string | number> {
-        return this.query;
-    }
-
     getFirstPath(): string {
-        return this.paths[0];
+        return this.pathSegments[0];
     }
 
     getLastPath(): string {
-        return this.paths[this.paths.length - 1];
+        return this.pathSegments[this.pathSegments.length - 1];
     }
 
     getParent(n = 1): UrlBuilder {
         const parent = UrlBuilder.createFromUrl(this.toString());
-        const lastPath = parent.paths.pop();
+        const lastPath = parent.pathSegments.pop();
 
-        parent.paths.filter(path => path !== lastPath);
+        parent.pathSegments.filter(path => path !== lastPath);
         parent.params.delete(lastPath.replace(':', ''));
         parent.query = new Map<string, string | number>();
 
@@ -109,19 +150,19 @@ export class UrlBuilder {
     }
 
     getBetween2Words(a: string, b: string): string {
-        const indexA = this.paths.findIndex(path => path === a);
-        const indexB = this.paths.findIndex(path => path === b);
+        const indexA = this.pathSegments.findIndex(path => path === a);
+        const indexB = this.pathSegments.findIndex(path => path === b);
 
         if (indexA === -1 || indexB === -1) {
             return null;
         }
-        return this.paths.slice(indexA + 1, indexB)[0];
+        return this.pathSegments.slice(indexA + 1, indexB)[0];
     }
 
     getRelativePath(query = false): string {
         const paths: string[] = [];
 
-        for (let path of this.paths) {
+        for (let path of this.pathSegments) {
             const param = this.params.get(path.replace(':', ''));
 
             if (param) {

@@ -1,4 +1,5 @@
 import {UrlBuilder} from "../src";
+import {Scheme} from "../src/enums/scheme.enum";
 
 describe('UrlBuilder', () => {
     const url_users_paginated = 'https://localhost/users?page=1';
@@ -41,10 +42,30 @@ describe('UrlBuilder', () => {
         expect(url.compareTo(url3, false)).toBe(false);
     });
 
+    test('should set scheme', () => {
+        const url: UrlBuilder = new UrlBuilder().setScheme(Scheme.HTTPS);
+
+        expect(url.getScheme()).toBe(Scheme.HTTPS);
+    });
+
+    test('should set host', () => {
+        const url: UrlBuilder = new UrlBuilder().setHost('localhost');
+
+        expect(url.getHost()).toBe('localhost');
+    });
+
+
     test('should set port', () => {
         const url: UrlBuilder = UrlBuilder.createFromUrl(url_users_paginated).setPort(3000);
 
         expect(url.toString()).toBe(url_users_paginated_with_port);
+        expect(url.getPort()).toBe(3000);
+    });
+
+    test('should set path segments', () => {
+        const url: UrlBuilder = new UrlBuilder().setPathSegments(['users', '10', 'comments']);
+
+        expect(url.getPathSegments()).toEqual(['users', '10', 'comments']);
     });
 
     test('should add params', () => {
@@ -69,6 +90,17 @@ describe('UrlBuilder', () => {
         expect(url.getParams().get('userId')).toEqual(10);
     });
 
+    test('should set the same params', () => {
+        const map = new Map<string, string|number>()
+            .set('userId', 10).set('commentId', 1);
+
+        const url: UrlBuilder = new UrlBuilder()
+            .addPath('users/:userId/comments/:commentId')
+            .setParams(map);
+
+        expect(url.getParams()).toEqual(map);
+    });
+
     test('should add queries', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
@@ -89,6 +121,17 @@ describe('UrlBuilder', () => {
             });
 
         expect(url.getQuery().get('order')).toBe('ASC');
+    });
+
+    test('should set the same queries', () => {
+        const map = new Map<string, string|number>()
+            .set('page', 1).set('order', 'ASC');
+
+        const url: UrlBuilder = new UrlBuilder()
+            .addPath('users')
+            .setQuery(map);
+
+        expect(url.getQuery()).toEqual(map);
     });
 
     test('should get first path', () => {

@@ -142,10 +142,8 @@ url.compareTo(url3); // Output: false
 ### Get word between two others
 Compare the current URL to another URL (UrlBuilder instance)
 ```ts
-const id = '434f65eb-4e5f-4b29-899c-b3e159fff61c';
-const url = UrlBuilder.createFromUrl('http://localhost:8080/users/:id').addParam('id', id);
-url.compareTo(url2); // Output: true
-url.compareTo(url3); // Output: false
+const url = UrlBuilder.createFromUrl('http://localhost:8080/users/10/comments');
+url.getBetween2Words('users', 'comments'); // Output: 10
 ```
 
 ### Split path from string (static)
