@@ -168,11 +168,22 @@ static createFromUrl(baseUrl: string): UrlBuilder
 static splitPath(path: string): string[]
 static trimPath(path: string): string
 compareTo(url: UrlBuilder, relative = true): boolean
+getScheme(): Scheme
+setScheme(scheme: Scheme): UrlBuilder
+getHost(): string
+setHost(host: string): UrlBuilder
+getPort(): numbe
 setPort(port: number): UrlBuilder
+getPathSegments(): string[]
+setPathSegments(segments: string[]): UrlBuilder
 addPath(path: string): UrlBuilder
+getParams(): Map<string, string | number>
+setParams(params: Map<string, string | number>): UrlBuilder
 addParam(key: string, value: string | number): UrlBuilder
 addParams(params: Record<string, string | number>): UrlBuilder
 getParams(): Map<string, string | number>
+getQuery(): Map<string, string | number>
+setQuery(query: Map<string, string | number>): UrlBuilder
 addQuery(key: string, value: string | number): UrlBuilder
 addQueries(queries: Record<string, string | number>): UrlBuilder
 getQuery(): Map<string, string | number>
@@ -184,6 +195,7 @@ getRelativePath(query = false): string
 getQueryString(): string
 toString(): string
 ```
+> **Note** : Only the non-static getParent() method return new instance of UrlBuilder. Others return the current instance.
 
 ## :balance_scale: Licence
 [MIT](LICENSE)
