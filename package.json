@@ -12,6 +12,7 @@
     "test:cov": "jest --coverage && make-coverage-badge"
   },
   "dependencies": {
+    "pg": "^8.7.1",
     "url-parse": "^1.5.1"
   },
   "devDependencies": {

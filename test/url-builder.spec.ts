@@ -68,6 +68,13 @@ describe('UrlBuilder', () => {
         expect(url.getPathSegments()).toEqual(['users', '10', 'comments']);
     });
 
+    test('should set path segments with params', () => {
+        const url: UrlBuilder = new UrlBuilder().setPathSegments(['users', ':id', 'comments'], { id: 10 });
+
+        expect(url.getPathSegments()).toEqual(['users', ':id', 'comments']);
+        expect(url.getRelativePath()).toEqual(path_user_comments);
+    });
+
     test('should add params', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users/:userId/comments/:commentId')
@@ -75,8 +82,14 @@ describe('UrlBuilder', () => {
                 userId: 10,
                 commentId: 1
             });
+        const url2: UrlBuilder = new UrlBuilder()
+            .addPath('users/:userId/comments/:commentId', {
+                userId: 10,
+                commentId: 1
+            })
 
         expect(url.getRelativePath()).toBe(path_user_comment);
+        expect(url2.getRelativePath()).toBe(path_user_comment);
     });
 
     test('should get the same params', () => {

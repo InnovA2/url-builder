@@ -78,14 +78,14 @@ export class UrlBuilder {
         return this.pathSegments;
     }
 
-    setPathSegments(segments: string[]): UrlBuilder {
+    setPathSegments(segments: string[], params?: Record<string, string | number>): UrlBuilder {
         this.pathSegments = segments;
-        return this;
+        return params ? this.addParams(params) : this;
     }
 
-    addPath(path: string): UrlBuilder {
+    addPath(path: string, params?: Record<string, string | number>): UrlBuilder {
         this.pathSegments.push(...UrlBuilder.splitPath(path));
-        return this;
+        return params ? this.addParams(params) : this;
     }
 
     getParams(): Map<string, string | number> {
