@@ -17,8 +17,8 @@ export declare class UrlBuilder {
     getPort(): number;
     setPort(port: number): UrlBuilder;
     getPathSegments(): string[];
-    setPathSegments(segments: string[]): UrlBuilder;
-    addPath(path: string): UrlBuilder;
+    setPathSegments(segments: string[], params?: Record<string, string | number>): UrlBuilder;
+    addPath(path: string, params?: Record<string, string | number>): UrlBuilder;
     getParams(): Map<string, string | number>;
     setParams(params: Map<string, string | number>): UrlBuilder;
     addParam(key: string, value: string | number): UrlBuilder;

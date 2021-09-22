@@ -61,13 +61,13 @@ class UrlBuilder {
     getPathSegments() {
         return this.pathSegments;
     }
-    setPathSegments(segments) {
+    setPathSegments(segments, params) {
         this.pathSegments = segments;
-        return this;
+        return params ? this.addParams(params) : this;
     }
-    addPath(path) {
+    addPath(path, params) {
         this.pathSegments.push(...UrlBuilder.splitPath(path));
-        return this;
+        return params ? this.addParams(params) : this;
     }
     getParams() {
         return this.params;

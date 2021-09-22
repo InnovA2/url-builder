@@ -48,12 +48,16 @@ Add new path segment(s)
 ```ts
 const userId = '170b16cd-ad47-4c9c-86cf-7c83bd40d775';
 url.addPath(':id/comments').addParam('id', userId);
+// Or
+url.addPath(':id/comments', { id: userId });
 ```
 Add multiples parameters
 ```ts
 const userId = '170b16cd-ad47-4c9c-86cf-7c83bd40d775';
 const commentId = '218dd1c4-0bb0-425a-be0b-85427304e100';
 url.addPath(':userId/comments/:commentId').addParams({ userId, commentId });
+// Or
+url.addPath(':userId/comments/:commentId', { userId, commentId });
 ```
 Get the first path segment
 ```ts
@@ -175,8 +179,8 @@ setHost(host: string): UrlBuilder
 getPort(): numbe
 setPort(port: number): UrlBuilder
 getPathSegments(): string[]
-setPathSegments(segments: string[]): UrlBuilder
-addPath(path: string): UrlBuilder
+setPathSegments(segments: string[], params: Record<string, string | number>): UrlBuilder
+addPath(path: string, params: Record<string, string | number>): UrlBuilder
 getParams(): Map<string, string | number>
 setParams(params: Map<string, string | number>): UrlBuilder
 addParam(key: string, value: string | number): UrlBuilder
