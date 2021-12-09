@@ -2,8 +2,12 @@ import {UrlBuilder} from "../src";
 import {Scheme} from "../src/enums/scheme.enum";
 
 describe('UrlBuilder', () => {
-    const url_users_paginated = 'https://localhost/users?page=1';
-    const url_users_paginated_with_port = 'https://localhost:3000/users?page=1';
+    const base_url = 'https://localhost';
+
+    const url_users_paginated = base_url + '/users?page=1';
+    const url_users_paginated_with_port = base_url + ':3000/users?page=1';
+
+    const url_group_users_paginated = base_url + '/groups/2/users?page=1';
 
     const path_users_with_qp = '/users?page=1&order=ASC';
 
@@ -145,6 +149,17 @@ describe('UrlBuilder', () => {
             .setQuery(map);
 
         expect(url.getQuery()).toEqual(map);
+    });
+
+    test('should merge path with another url', () => {
+        const url: UrlBuilder = UrlBuilder.createFromUrl(base_url)
+            .addPath('groups');
+
+        const anotherUrl: UrlBuilder = new UrlBuilder()
+            .addPath(':id/users', { id: 2 })
+            .addQuery('page', 1)
+
+        expect(url.mergePathWith(anotherUrl).toString()).toEqual(url_group_users_paginated);
     });
 
     test('should get first path', () => {

@@ -27,6 +27,7 @@ export declare class UrlBuilder {
     setQuery(query: Map<string, string | number>): UrlBuilder;
     addQuery(key: string, value: string | number): UrlBuilder;
     addQueries(queries: Record<string, string | number>): UrlBuilder;
+    mergePathWith(url: UrlBuilder): UrlBuilder;
     getFirstPath(): string;
     getLastPath(): string;
     getParent(n?: number): UrlBuilder;

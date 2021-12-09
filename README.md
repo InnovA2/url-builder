@@ -83,6 +83,20 @@ const order = 'DESC';
 url.addQueries({ page, order });
 ```
 
+### Merge path and query params
+It's possible to merge path and query params with another url
+```ts
+const url = UrlBuilder.createFromUrl('http://localhost:3000').addPath('groups');
+
+const anotherUrl = new UrlBuilder()
+    .addPath(':id/users', { id: 2 })
+    .addQuery('page', 1)
+
+url.mergePathWith(anotherUrl).toString() // Get 'http://localhost:3000/groups/2/users?page=1'
+```
+> **Note** : This function merge only path, params and query params with current url.
+
+
 ### Work with parent
 Get parent URL easly.<br>
 *This function return a new instance of UrlBuilder*
@@ -191,6 +205,7 @@ setQuery(query: Map<string, string | number>): UrlBuilder
 addQuery(key: string, value: string | number): UrlBuilder
 addQueries(queries: Record<string, string | number>): UrlBuilder
 getQuery(): Map<string, string | number>
+mergePathWith(url: UrlBuilder): UrlBuilder
 getFirstPath(): string
 getLastPath(): string
 getParent(n = 1): UrlBuilder

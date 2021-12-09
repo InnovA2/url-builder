@@ -103,6 +103,12 @@ class UrlBuilder {
         }
         return this;
     }
+    mergePathWith(url) {
+        this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
+        this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
+        this.setQuery(new Map([...this.query.entries(), ...url.query.entries()]));
+        return this;
+    }
     getFirstPath() {
         return this.pathSegments[0];
     }

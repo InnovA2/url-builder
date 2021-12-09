@@ -130,6 +130,14 @@ export class UrlBuilder {
         return this;
     }
 
+    mergePathWith(url: UrlBuilder): UrlBuilder {
+        this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
+        this.setParams(new Map([...this.params.entries(), ...url.params.entries()]))
+        this.setQuery(new Map([...this.query.entries(), ...url.query.entries()]))
+
+        return this;
+    }
+
     getFirstPath(): string {
         return this.pathSegments[0];
     }
