@@ -6,6 +6,7 @@ export declare class UrlBuilder {
     private pathSegments;
     private params;
     private query;
+    private fragment;
     static createFromUrl(baseUrl: string): UrlBuilder;
     static splitPath(path: string): string[];
     static trimPath(path: string): string;
@@ -27,12 +28,14 @@ export declare class UrlBuilder {
     setQuery(query: Map<string, string | number>): UrlBuilder;
     addQuery(key: string, value: string | number): UrlBuilder;
     addQueries(queries: Record<string, string | number>): UrlBuilder;
+    getFragment(): string;
+    setFragment(fragment: string): UrlBuilder;
     mergePathWith(url: UrlBuilder): UrlBuilder;
     getFirstPath(): string;
     getLastPath(): string;
     getParent(n?: number): UrlBuilder;
     getBetween2Words(a: string, b: string): string;
-    getRelativePath(query?: boolean): string;
+    getRelativePath(withQuery?: boolean, withFragment?: boolean): string;
     getQueryString(): string;
     toString(): string;
 }

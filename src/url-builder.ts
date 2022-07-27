@@ -1,5 +1,5 @@
 import * as urlParser from 'url-parse';
-import {Scheme} from './enums/scheme.enum';
+import { Scheme } from './enums/scheme.enum';
 
 export class UrlBuilder {
     private scheme = Scheme.HTTPS;
@@ -8,6 +8,7 @@ export class UrlBuilder {
     private pathSegments: string[] = [];
     private params = new Map<string, string | number>();
     private query = new Map<string, string | number>();
+    private fragment: string;
 
     static createFromUrl(baseUrl: string): UrlBuilder {
         const url = new UrlBuilder();
@@ -31,6 +32,8 @@ export class UrlBuilder {
                 url.query.set(key, String(value));
             }
         }
+
+        url.fragment = items.hash.slice(1);
 
         return url;
     }
@@ -130,6 +133,15 @@ export class UrlBuilder {
         return this;
     }
 
+    getFragment(): string {
+        return this.fragment;
+    }
+
+    setFragment(fragment: string): UrlBuilder {
+        this.fragment = fragment;
+        return this;
+    }
+
     mergePathWith(url: UrlBuilder): UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]))
@@ -167,7 +179,7 @@ export class UrlBuilder {
         return this.pathSegments.slice(indexA + 1, indexB)[0];
     }
 
-    getRelativePath(query = false): string {
+    getRelativePath(withQuery = false, withFragment = false): string {
         const paths: string[] = [];
 
         for (let path of this.pathSegments) {
@@ -182,7 +194,9 @@ export class UrlBuilder {
 
         const relativePath = paths.length ? ('/' + paths.join('/')) : '';
         const queryString = this.getQueryString();
-        return query && queryString ? relativePath + queryString : relativePath;
+
+        const url = withQuery && queryString ? relativePath + queryString : relativePath;
+        return withFragment ? `${url}#${this.fragment}` : url;
     }
 
     getQueryString(): string {

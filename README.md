@@ -83,6 +83,29 @@ const order = 'DESC';
 url.addQueries({ page, order });
 ```
 
+### Handle fragment
+Parse fragment with url
+```ts
+const url = UrlBuilder.createFromUrl('http://localhost/users?page=1#foo');
+url.getRelativePath(false, true);
+// Output : /users#foo
+// The first boolean is "withQuery" and the seconde is "withFragment"
+// With query params and fragment :
+url.getRelativePath(true, true);
+// Output : /users?page=1#foo
+```
+Define fragment without hash
+```ts
+url.setFragment('bar');
+```
+Retrieve fragment
+```ts
+const fragment = url.getFragment();
+// Output : bar
+url.getRelativePath(false, true);
+// Output : /users#bar
+```
+
 ### Merge path and query params
 It's possible to merge path and query params with another url
 ```ts

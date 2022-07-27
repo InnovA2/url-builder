@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
         "baseUrl": "./",
-        "module": "commonjs",
-        "target": "es2015",
+        "module": "es6",
+        "target": "es6",
+        "moduleResolution": "node",
         "declaration": true,
         "outDir": "./dist",
         "lib": [

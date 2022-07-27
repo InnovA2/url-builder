@@ -1,6 +1,6 @@
 {
   "name": "@innova2/url-builder",
-  "version": "1.4.0",
+  "version": "1.5.1",
   "description": "A lightweight library with many feature to easy build URLs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
     "test:cov": "jest --coverage && make-coverage-badge"
   },
   "dependencies": {
-    "url-parse": "^1.5.1"
+    "url-parse": "^1.5.10"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

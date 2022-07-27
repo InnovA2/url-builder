@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.UrlComponent = void 0;
-var UrlComponent;
+export var UrlComponent;
 (function (UrlComponent) {
     UrlComponent["SCHEME"] = "scheme";
     UrlComponent["HOST"] = "host";
@@ -9,4 +6,4 @@ var UrlComponent;
     UrlComponent["PATHS"] = "paths";
     UrlComponent["PARAMS"] = "params";
     UrlComponent["QUERY"] = "query";
-})(UrlComponent = exports.UrlComponent || (exports.UrlComponent = {}));
+})(UrlComponent || (UrlComponent = {}));

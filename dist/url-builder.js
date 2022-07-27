@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.UrlBuilder = void 0;
-const urlParser = require("url-parse");
-const scheme_enum_1 = require("./enums/scheme.enum");
-class UrlBuilder {
+import * as urlParser from 'url-parse';
+import { Scheme } from './enums/scheme.enum';
+export class UrlBuilder {
     constructor() {
-        this.scheme = scheme_enum_1.Scheme.HTTPS;
+        this.scheme = Scheme.HTTPS;
         this.pathSegments = [];
         this.params = new Map();
         this.query = new Map();
@@ -26,6 +23,7 @@ class UrlBuilder {
                 url.query.set(key, String(value));
             }
         }
+        url.fragment = items.hash.slice(1);
         return url;
     }
     static splitPath(path) {
@@ -103,6 +101,13 @@ class UrlBuilder {
         }
         return this;
     }
+    getFragment() {
+        return this.fragment;
+    }
+    setFragment(fragment) {
+        this.fragment = fragment;
+        return this;
+    }
     mergePathWith(url) {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
@@ -131,7 +136,7 @@ class UrlBuilder {
         }
         return this.pathSegments.slice(indexA + 1, indexB)[0];
     }
-    getRelativePath(query = false) {
+    getRelativePath(withQuery = false, withFragment = false) {
         const paths = [];
         for (let path of this.pathSegments) {
             const param = this.params.get(path.replace(':', ''));
@@ -142,7 +147,8 @@ class UrlBuilder {
         }
         const relativePath = paths.length ? ('/' + paths.join('/')) : '';
         const queryString = this.getQueryString();
-        return query && queryString ? relativePath + queryString : relativePath;
+        const url = withQuery && queryString ? relativePath + queryString : relativePath;
+        return withFragment ? `${url}#${this.fragment}` : url;
     }
     getQueryString() {
         const queryParams = [];
@@ -161,4 +167,3 @@ class UrlBuilder {
             .join('');
     }
 }
-exports.UrlBuilder = UrlBuilder;

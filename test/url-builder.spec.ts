@@ -4,7 +4,8 @@ import {Scheme} from "../src/enums/scheme.enum";
 describe('UrlBuilder', () => {
     const base_url = 'https://localhost';
 
-    const url_users_paginated = base_url + '/users?page=1';
+    const path_users_paginated = '/users?page=1';
+    const url_users_paginated = base_url + path_users_paginated;
     const url_users_paginated_with_port = base_url + ':3000/users?page=1';
 
     const url_group_users_paginated = base_url + '/groups/2/users?page=1';
@@ -149,6 +150,22 @@ describe('UrlBuilder', () => {
             .setQuery(map);
 
         expect(url.getQuery()).toEqual(map);
+    });
+
+    test('should parse fragment', () => {
+        const url: UrlBuilder = UrlBuilder.createFromUrl(url_users_paginated_with_port + '#foo');
+
+        expect(url.getFragment()).toBe('foo');
+    });
+
+    test('should set fragment', () => {
+        const url: UrlBuilder = UrlBuilder
+            .createFromUrl(url_users_paginated)
+            .setFragment('bar');
+
+        expect(url.getFragment()).toBe('bar');
+        expect(url.getRelativePath(true, true)).toBe(path_users_paginated + '#bar');
+        expect(url.getRelativePath()).toBe('/users');
     });
 
     test('should merge path with another url', () => {
