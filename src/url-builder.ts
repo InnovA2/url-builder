@@ -183,10 +183,11 @@ export class UrlBuilder {
         const paths: string[] = [];
 
         for (let path of this.pathSegments) {
-            const param = this.params.get(path.replace(':', ''));
+            const param = Array.from(this.params.entries())
+                .find(([k, v]) => `:${k}` === path);
 
             if (param) {
-                path = String(param);
+                path = String(param[1]);
             }
 
             paths.push(path);
