@@ -81,12 +81,12 @@ export class UrlBuilder {
         return this.pathSegments;
     }
 
-    setPathSegments(segments: string[], params?: Record<string, string | number>): UrlBuilder {
+    setPathSegments(segments: string[], params?: Record<string, string | number | boolean>): UrlBuilder {
         this.pathSegments = segments;
         return params ? this.addParams(params) : this;
     }
 
-    addPath(path: string, params?: Record<string, string | number>): UrlBuilder {
+    addPath(path: string, params?: Record<string, string | number | boolean>): UrlBuilder {
         this.pathSegments.push(...UrlBuilder.splitPath(path));
         return params ? this.addParams(params) : this;
     }
@@ -101,11 +101,25 @@ export class UrlBuilder {
     }
 
     addParam(key: string, value: string | number | boolean): UrlBuilder {
+        if (!this.params.has(key)) {
+            this.params.set(key, value);
+        }
+        return this;
+    }
+
+    addOrReplaceParam(key: string, value: string | number | boolean): UrlBuilder {
         this.params.set(key, value);
         return this;
     }
 
     addParams(params: Record<string, string | number | boolean>): UrlBuilder {
+        for (const [key, value] of Object.entries(params)) {
+            this.addParam(key, value);
+        }
+        return this;
+    }
+
+    addOrReplaceParams(params: Record<string, string | number | boolean>): UrlBuilder {
         for (const [key, value] of Object.entries(params)) {
             this.params.set(key, value);
         }
@@ -122,11 +136,25 @@ export class UrlBuilder {
     }
 
     addQueryParam(key: string, value: string | number | boolean): UrlBuilder {
+        if (!this.query.has(key)) {
+            this.query.set(key, value);
+        }
+        return this;
+    }
+
+    addOrReplaceQueryParam(key: string, value: string | number | boolean): UrlBuilder {
         this.query.set(key, value);
         return this;
     }
 
     addQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder {
+        for (const [key, value] of Object.entries(queries)) {
+            this.addQueryParam(key, value);
+        }
+        return this;
+    }
+
+    addOrReplaceQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder {
         for (const [key, value] of Object.entries(queries)) {
             this.query.set(key, value);
         }

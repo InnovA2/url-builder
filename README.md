@@ -51,13 +51,40 @@ url.addPath(':id/comments').addParam('id', userId);
 // Or
 url.addPath(':id/comments', { id: userId });
 ```
-Add multiples parameters
+Add multiples parameters after adding path segment(s)
 ```ts
 const userId = '170b16cd-ad47-4c9c-86cf-7c83bd40d775';
 const commentId = '218dd1c4-0bb0-425a-be0b-85427304e100';
 url.addPath(':userId/comments/:commentId').addParams({ userId, commentId });
 // Or
 url.addPath(':userId/comments/:commentId', { userId, commentId });
+```
+If you want to add or replace existing param, use instead :
+```ts
+const userId = '170b16cd-ad47-4c9c-86cf-7c83bd40d775';
+const commentId = '218dd1c4-0bb0-425a-be0b-85427304e100';
+url.addPath(':userId/comments/:commentId')
+        .addParams({ userId: 3, commentId: 1 });
+
+// Without replacement :
+url.addParam('userId', userId);
+// Param 'userId' is always : 3
+
+// With replacement :
+url.addOrReplaceParam('userId', userId);
+// Param 'userId' is now : 170b16cd-ad47-4c9c-86cf-7c83bd40d775
+
+
+// Or with multiples parameters
+// Without replacement :
+url.addParams({ userId: 10, commentId: 5 });
+// Param 'userId' is always : 170b16cd-ad47-4c9c-86cf-7c83bd40d775
+// Param 'commentId' is always : 1
+
+// With replacement :
+url.addOrReplaceParams({ userId: 10, commentId: 5 });
+// Param 'userId' is now : 10
+// Param 'commentId' is now : 5
 ```
 Get the first path segment
 ```ts
@@ -81,6 +108,32 @@ Add multiples query params
 const page = 2;
 const order = 'DESC';
 url.addQueryParams({ page, order });
+```
+If you want to add or replace existing query, use instead :
+```ts
+const page = 2;
+const order = 'DESC';
+url.addQueryParams({ page, order });
+
+// Without replacement :
+url.addQueryParam('page', 3);
+// QueryParam 'page' is always : 2
+
+// With replacement :
+url.addOrReplaceQueryParam('page', 3);
+// QueryParam 'page' is now : 3
+
+
+// Or with multiples parameters
+// Without replacement :
+url.addQueryParams({ page: 4, order: 'ASC' });
+// QueryParam 'page' is always : 3
+// QueryParam 'order' is always : DESC
+
+// With replacement :
+url.addOrReplaceQueryParams({ page: 4, order: 'ASC' });
+// QueryParam 'page' is now : 4
+// QueryParam 'order' is now : ASC
 ```
 
 ### Handle fragment

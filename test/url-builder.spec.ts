@@ -95,6 +95,18 @@ describe('UrlBuilder', () => {
 
         expect(url.getRelativePath()).toBe(path_user_comment);
         expect(url2.getRelativePath()).toBe(path_user_comment);
+
+        url.addParam('userId', 15); // Should be ignored
+        expect(url.getRelativePath()).toBe(path_user_comment);
+
+        url.addOrReplaceParam('userId', 15); // Should be replaced
+        expect(url.getRelativePath()).toBe('/users/15/comments/1');
+
+        url.addParams({ commentId: 2 }); // Should be ignored
+        expect(url.getRelativePath()).toBe('/users/15/comments/1');
+
+        url.addOrReplaceParams({ commentId: 2 }); // Should be replaced
+        expect(url.getRelativePath()).toBe('/users/15/comments/2');
     });
 
     test('should get the same params', () => {
@@ -128,6 +140,18 @@ describe('UrlBuilder', () => {
             });
 
         expect(url.getRelativePath(true)).toBe(path_users_with_qp);
+
+        url.addQueryParam('page', 2); // Should be ignored
+        expect(url.getRelativePath(true)).toBe(path_users_with_qp);
+
+        url.addOrReplaceQueryParam('page', 2); // Should be replaced
+        expect(url.getRelativePath(true)).toBe('/users?page=2&order=ASC');
+
+        url.addQueryParams({ page: 3, order: 'DESC' }); // Should be ignored
+        expect(url.getRelativePath(true)).toBe('/users?page=2&order=ASC');
+
+        url.addOrReplaceQueryParams({ page: 3, order: 'DESC' }); // Should be replaced
+        expect(url.getRelativePath(true)).toBe('/users?page=3&order=DESC');
     });
 
     test('should get the same queries', () => {
