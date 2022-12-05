@@ -75,27 +75,51 @@ export class UrlBuilder {
         return this;
     }
     addParam(key, value) {
+        if (!this.params.has(key)) {
+            this.params.set(key, value);
+        }
+        return this;
+    }
+    addOrReplaceParam(key, value) {
         this.params.set(key, value);
         return this;
     }
     addParams(params) {
         for (const [key, value] of Object.entries(params)) {
+            this.addParam(key, value);
+        }
+        return this;
+    }
+    addOrReplaceParams(params) {
+        for (const [key, value] of Object.entries(params)) {
             this.params.set(key, value);
         }
         return this;
     }
-    getQuery() {
+    getQueryParams() {
         return this.query;
     }
-    setQuery(query) {
+    setQueryParams(query) {
         this.query = query;
         return this;
     }
-    addQuery(key, value) {
+    addQueryParam(key, value) {
+        if (!this.query.has(key)) {
+            this.query.set(key, value);
+        }
+        return this;
+    }
+    addOrReplaceQueryParam(key, value) {
         this.query.set(key, value);
         return this;
     }
-    addQueries(queries) {
+    addQueryParams(queries) {
+        for (const [key, value] of Object.entries(queries)) {
+            this.addQueryParam(key, value);
+        }
+        return this;
+    }
+    addOrReplaceQueryParams(queries) {
         for (const [key, value] of Object.entries(queries)) {
             this.query.set(key, value);
         }
@@ -111,7 +135,7 @@ export class UrlBuilder {
     mergePathWith(url) {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
-        this.setQuery(new Map([...this.query.entries(), ...url.query.entries()]));
+        this.setQueryParams(new Map([...this.query.entries(), ...url.query.entries()]));
         return this;
     }
     getFirstPath() {
@@ -139,9 +163,10 @@ export class UrlBuilder {
     getRelativePath(withQuery = false, withFragment = false) {
         const paths = [];
         for (let path of this.pathSegments) {
-            const param = this.params.get(path.replace(':', ''));
+            const param = Array.from(this.params.entries())
+                .find(([k, v]) => `:${k}` === path);
             if (param) {
-                path = String(param);
+                path = String(param[1]);
             }
             paths.push(path);
         }

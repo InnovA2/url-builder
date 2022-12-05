@@ -23,6 +23,12 @@ A lightweight library with many features to easy build URLs
 - [Authors](#busts_in_silhouette-authors)
 - [Contributors](#handshake-contributors)
 
+**Breaking changes from 1.x to 2.x :**
+- `UrlBuilder#addParam` does not replace existing param now. Use `UrlBuilder#addOrReplaceParam` now
+- `UrlBuilder#addParams` does not replace existing params now. Use `UrlBuilder#addOrReplaceParams` now
+- `UrlBuilder#addQueryParam` does not replace existing param now. Use `UrlBuilder#addOrReplaceQueryParam` now
+- `UrlBuilder#addQueryParams` does not replace existing params now. Use `UrlBuilder#addOrReplaceQueryParams` now
+
 ## :bookmark_tabs: Features
 This library allows :
 - Create URLs most easly
