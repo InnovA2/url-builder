@@ -24,7 +24,7 @@ describe('UrlBuilder', () => {
     test('should parse existing url', () => {
         const url: UrlBuilder = UrlBuilder
             .createFromUrl(url_users_paginated_with_port)
-            .addQuery('order', 'DESC');
+            .addQueryParam('order', 'DESC');
 
         expect(url.toString()).toBe(url_users_paginated_with_port + '&order=DESC');
     });
@@ -122,7 +122,7 @@ describe('UrlBuilder', () => {
     test('should add queries', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
-            .addQueries({
+            .addQueryParams({
                 page: 1,
                 order: 'ASC'
             });
@@ -133,12 +133,12 @@ describe('UrlBuilder', () => {
     test('should get the same queries', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
-            .addQueries({
+            .addQueryParams({
                 page: 1,
                 order: 'ASC'
             });
 
-        expect(url.getQuery().get('order')).toBe('ASC');
+        expect(url.getQueryParams().get('order')).toBe('ASC');
     });
 
     test('should set the same queries', () => {
@@ -147,9 +147,9 @@ describe('UrlBuilder', () => {
 
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
-            .setQuery(map);
+            .setQueryParams(map);
 
-        expect(url.getQuery()).toEqual(map);
+        expect(url.getQueryParams()).toEqual(map);
     });
 
     test('should parse fragment', () => {
@@ -174,7 +174,7 @@ describe('UrlBuilder', () => {
 
         const anotherUrl: UrlBuilder = new UrlBuilder()
             .addPath(':id/users', { id: 2 })
-            .addQuery('page', 1)
+            .addQueryParam('page', 1)
 
         expect(url.mergePathWith(anotherUrl).toString()).toEqual(url_group_users_paginated);
     });
@@ -213,7 +213,7 @@ describe('UrlBuilder', () => {
 
 
     test('should get only query in relative path', () => {
-        const url: UrlBuilder = new UrlBuilder().addQuery('page', 2);
+        const url: UrlBuilder = new UrlBuilder().addQueryParam('page', 2);
 
         expect(url.getRelativePath(true)).toBe('?page=2');
     });

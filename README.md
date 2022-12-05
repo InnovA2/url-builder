@@ -74,13 +74,13 @@ url.getLastPath(); // Output: 'cells'
 Add new query param
 ```ts
 const page = 2;
-url.addQuery('page', page);
+url.addQueryParam('page', page);
 ```
 Add multiples query params
 ```ts
 const page = 2;
 const order = 'DESC';
-url.addQueries({ page, order });
+url.addQueryParams({ page, order });
 ```
 
 ### Handle fragment
@@ -113,7 +113,7 @@ const url = UrlBuilder.createFromUrl('http://localhost:3000').addPath('groups');
 
 const anotherUrl = new UrlBuilder()
     .addPath(':id/users', { id: 2 })
-    .addQuery('page', 1)
+    .addQueryParam('page', 1)
 
 url.mergePathWith(anotherUrl).toString() // Get 'http://localhost:3000/groups/2/users?page=1'
 ```
@@ -142,7 +142,7 @@ url.getRelativePath(); // Output: '/posts/a937b39e-9664-404a-ac56-f3da2b83a951'
 And with query params<br>
 *Don't forget to add 'true' parameter to allow query params conversion*
 ```ts
-url.addQuery('displaySimilar', true);
+url.addQueryParam('displaySimilar', true);
 url.getRelativePath(); // Output: '/posts/a937b39e-9664-404a-ac56-f3da2b83a951'
 url.getRelativePath(true); // Output: '/posts/a937b39e-9664-404a-ac56-f3da2b83a951?displaySimilar=true'
 ```
@@ -150,7 +150,7 @@ url.getRelativePath(true); // Output: '/posts/a937b39e-9664-404a-ac56-f3da2b83a9
 ### Get query params in string
 Retrieve the query params in string format
 ```ts
-const url = UrlBuilder.createFromUrl('http://localhost:8080/vehicles').addQueries({
+const url = UrlBuilder.createFromUrl('http://localhost:8080/vehicles').addQueryParams({
   page: 2,
   order: 'ASC',
 });
@@ -223,11 +223,11 @@ setParams(params: Map<string, string | number>): UrlBuilder
 addParam(key: string, value: string | number): UrlBuilder
 addParams(params: Record<string, string | number>): UrlBuilder
 getParams(): Map<string, string | number>
-getQuery(): Map<string, string | number>
-setQuery(query: Map<string, string | number>): UrlBuilder
-addQuery(key: string, value: string | number): UrlBuilder
-addQueries(queries: Record<string, string | number>): UrlBuilder
-getQuery(): Map<string, string | number>
+getQueryParams(): Map<string, string | number>
+setQueryParams(query: Map<string, string | number>): UrlBuilder
+addQueryParam(key: string, value: string | number): UrlBuilder
+addQueryParams(queries: Record<string, string | number>): UrlBuilder
+getQueryParams(): Map<string, string | number>
 mergePathWith(url: UrlBuilder): UrlBuilder
 getFirstPath(): string
 getLastPath(): string
@@ -237,7 +237,7 @@ getRelativePath(query = false): string
 getQueryString(): string
 toString(): string
 ```
-> **Note** : Only the non-static getParent() method return new instance of UrlBuilder. Others return the current instance.
+> **Note** : Only the non-static getParent() method return new instance of UrlBuilder. Others update and return the current instance.
 
 ## :balance_scale: Licence
 [MIT](LICENSE)

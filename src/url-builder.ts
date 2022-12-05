@@ -6,8 +6,8 @@ export class UrlBuilder {
     private host: string;
     private port: number;
     private pathSegments: string[] = [];
-    private params = new Map<string, string | number>();
-    private query = new Map<string, string | number>();
+    private params = new Map<string, string | number | boolean>();
+    private query = new Map<string, string | number | boolean>();
     private fragment: string;
 
     static createFromUrl(baseUrl: string): UrlBuilder {
@@ -91,42 +91,42 @@ export class UrlBuilder {
         return params ? this.addParams(params) : this;
     }
 
-    getParams(): Map<string, string | number> {
+    getParams(): Map<string, string | number | boolean> {
         return this.params;
     }
 
-    setParams(params: Map<string, string | number>): UrlBuilder {
+    setParams(params: Map<string, string | number | boolean>): UrlBuilder {
         this.params = params;
         return this;
     }
 
-    addParam(key: string, value: string | number): UrlBuilder {
+    addParam(key: string, value: string | number | boolean): UrlBuilder {
         this.params.set(key, value);
         return this;
     }
 
-    addParams(params: Record<string, string | number>): UrlBuilder {
+    addParams(params: Record<string, string | number | boolean>): UrlBuilder {
         for (const [key, value] of Object.entries(params)) {
             this.params.set(key, value);
         }
         return this;
     }
 
-    getQuery(): Map<string, string | number> {
+    getQueryParams(): Map<string, string | number | boolean> {
         return this.query;
     }
 
-    setQuery(query: Map<string, string | number>): UrlBuilder {
+    setQueryParams(query: Map<string, string | number | boolean>): UrlBuilder {
         this.query = query;
         return this;
     }
 
-    addQuery(key: string, value: string | number): UrlBuilder {
+    addQueryParam(key: string, value: string | number | boolean): UrlBuilder {
         this.query.set(key, value);
         return this;
     }
 
-    addQueries(queries: Record<string, string | number>): UrlBuilder {
+    addQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder {
         for (const [key, value] of Object.entries(queries)) {
             this.query.set(key, value);
         }
@@ -145,7 +145,7 @@ export class UrlBuilder {
     mergePathWith(url: UrlBuilder): UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]))
-        this.setQuery(new Map([...this.query.entries(), ...url.query.entries()]))
+        this.setQueryParams(new Map([...this.query.entries(), ...url.query.entries()]))
 
         return this;
     }
