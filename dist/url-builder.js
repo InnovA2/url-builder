@@ -1,8 +1,11 @@
-import * as urlParser from 'url-parse';
-import { Scheme } from './enums/scheme.enum';
-export class UrlBuilder {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UrlBuilder = void 0;
+const urlParser = require("url-parse");
+const scheme_enum_1 = require("./enums/scheme.enum");
+class UrlBuilder {
     constructor() {
-        this.scheme = Scheme.HTTPS;
+        this.scheme = scheme_enum_1.Scheme.HTTPS;
         this.pathSegments = [];
         this.params = new Map();
         this.query = new Map();
@@ -192,3 +195,4 @@ export class UrlBuilder {
             .join('');
     }
 }
+exports.UrlBuilder = UrlBuilder;
