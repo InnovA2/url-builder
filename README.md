@@ -253,11 +253,14 @@ const url4: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
 url4.compareToPathBySegment('/users/10/comments', true) // Output: true
 ```
 
-### Get word between two others
-Compare the current URL to another URL (UrlBuilder instance)
+### Get segments between two others
+Get the segments path between two segments
 ```ts
 const url = UrlBuilder.createFromUrl('http://localhost:8080/users/10/comments');
-url.getBetween2Words('users', 'comments'); // Output: 10
+url.getBetween2Segments('users', 'comments'); // Output: 10
+
+const url2 = UrlBuilder.createFromUrl('http://localhost:8080/users/10/comments/5');
+url2.getBetween2Segments('users', '5'); // Output: 10/comments
 ```
 
 ### Split path from string (static)
@@ -306,7 +309,7 @@ mergePathWith(url: UrlBuilder): UrlBuilder
 getFirstPath(): string
 getLastPath(): string
 getParent(n = 1): UrlBuilder
-getBetween2Words(a: string, b: string): string
+getBetween2Segments(a: string, b: string): string
 getRelativePath(query = false): string
 getQueryString(): string
 toString(): string
