@@ -1,5 +1,6 @@
 import * as urlParser from 'url-parse';
 import { Scheme } from './enums/scheme.enum';
+import { UrlConstants } from './url.constants';
 
 export class UrlBuilder {
     private scheme = Scheme.HTTPS;
@@ -10,6 +11,10 @@ export class UrlBuilder {
     private query = new Map<string, string | number | boolean>();
     private fragment: string;
 
+    /**
+     * Create UrlBuilder instance from string url
+     * @param baseUrl
+     */
     static createFromUrl(baseUrl: string): UrlBuilder {
         const url = new UrlBuilder();
 
@@ -25,7 +30,7 @@ export class UrlBuilder {
             url.port = +items.port;
         }
 
-        url.pathSegments = this.splitPath(items.pathname);
+        url.pathSegments = this.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
 
         if (items.query) {
             for (const [key, value] of Object.entries(items.query)) {
@@ -38,16 +43,52 @@ export class UrlBuilder {
         return url;
     }
 
+    /**
+     * Split path in segments by slash
+     * @param path relative path to split
+     */
     static splitPath(path: string): string[] {
-        return path.split('/').filter((p) => p);
+        return path.split(UrlConstants.URL_PATH_SEPARATOR)
+            .filter(segment => segment)
+            .map(segment => segment.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
     }
 
+    /**
+     * Trim path (e.g. /users/:id/ -> user/:id)
+     * @param path relative path to trim
+     */
     static trimPath(path: string): string {
-        return this.splitPath(path).join('/');
+        return this.splitPath(path).join(UrlConstants.URL_PATH_SEPARATOR);
     }
 
+    /**
+     * Compare the current UrlBuilder to another
+     * @param url UrlBuilder to compare
+     * @param relative true to compare only relative path
+     */
     compareTo(url: UrlBuilder, relative = true): boolean {
         return (relative && url.getRelativePath() === this.getRelativePath()) || (!relative && url.toString() === this.toString());
+    }
+
+    /**
+     * Compare current path to unfilled path parameters
+     * @param path final relative path (e.g. /users/:id/groups)
+     * @param validateUnfilledParams true to validate params unfilled from currentUrl (e.g. /users/:id/groups)
+     */
+    compareToPathBySegment(path: string, validateUnfilledParams = false): boolean {
+        const pathSegments = UrlBuilder.splitPath(path);
+        const matches = this.pathSegments.map((segment, i) => {
+            if (!pathSegments[i]) {
+                return false;
+            }
+            if (segment.startsWith(UrlConstants.URL_PATH_PREFIX)) {
+                const param = this.params.get(segment.replace(UrlConstants.URL_PATH_PREFIX, ''));
+                return validateUnfilledParams || (param === pathSegments[i]);
+            }
+            return pathSegments[i].toLowerCase() === segment.toLowerCase();
+        });
+
+        return pathSegments.length === this.pathSegments.length && matches.every((m) => m);
     }
 
     getScheme(): Scheme {
@@ -170,6 +211,10 @@ export class UrlBuilder {
         return this;
     }
 
+    /**
+     * Merge path segments, params and queryParams with passed UrlBuilder
+     * @param url to merge path
+     */
     mergePathWith(url: UrlBuilder): UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]))
@@ -178,26 +223,41 @@ export class UrlBuilder {
         return this;
     }
 
+    /**
+     * Get first path segment
+     */
     getFirstPath(): string {
         return this.pathSegments[0];
     }
 
+    /**
+     * Get last path segment
+     */
     getLastPath(): string {
         return this.pathSegments[this.pathSegments.length - 1];
     }
 
+    /**
+     * Get parent of the current url (e.g. /users/:id/groups -> /users/:id)
+     * @param n offset/level
+     */
     getParent(n = 1): UrlBuilder {
         const parent = UrlBuilder.createFromUrl(this.toString());
         const lastPath = parent.pathSegments.pop();
 
         parent.pathSegments.filter(path => path !== lastPath);
-        parent.params.delete(lastPath.replace(':', ''));
+        parent.params.delete(lastPath.replace(UrlConstants.URL_PATH_PREFIX, ''));
         parent.query = new Map<string, string | number>();
 
         return n > 1 ? parent.getParent(n - 1) : parent;
     }
 
-    getBetween2Words(a: string, b: string): string {
+    /**
+     * Get path segments between two segments
+     * @param a first segment to search
+     * @param b last segment to search
+     */
+    getBetween2Segments(a: string, b: string): string {
         const indexA = this.pathSegments.findIndex(path => path === a);
         const indexB = this.pathSegments.findIndex(path => path === b);
 
@@ -207,12 +267,17 @@ export class UrlBuilder {
         return this.pathSegments.slice(indexA + 1, indexB)[0];
     }
 
+    /**
+     * Get relative path
+     * @param withQuery true to get query params
+     * @param withFragment true to get fragment
+     */
     getRelativePath(withQuery = false, withFragment = false): string {
         const paths: string[] = [];
 
         for (let path of this.pathSegments) {
             const param = Array.from(this.params.entries())
-                .find(([k, v]) => `:${k}` === path);
+                .find(([k, v]) => `${UrlConstants.URL_PATH_PREFIX}${k}` === path);
 
             if (param) {
                 path = String(param[1]);
@@ -221,13 +286,16 @@ export class UrlBuilder {
             paths.push(path);
         }
 
-        const relativePath = paths.length ? ('/' + paths.join('/')) : '';
+        const relativePath = paths.length ? (UrlConstants.URL_PATH_SEPARATOR + paths.join(UrlConstants.URL_PATH_SEPARATOR)) : '';
         const queryString = this.getQueryString();
 
         const url = withQuery && queryString ? relativePath + queryString : relativePath;
         return withFragment ? `${url}#${this.fragment}` : url;
     }
 
+    /**
+     * Get query params as string
+     */
     getQueryString(): string {
         const queryParams: string[] = [];
 
@@ -238,6 +306,9 @@ export class UrlBuilder {
         return queryParams.length ? ('?' + queryParams.join('&')) : null;
     }
 
+    /**
+     * Convert full UrlBuilder to string url
+     */
     toString(): string {
         let baseUrl = this.host ? [this.scheme, this.host].join('://') : '';
 

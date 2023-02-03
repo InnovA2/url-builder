@@ -239,6 +239,20 @@ url.compareTo(url2); // Output: true
 url.compareTo(url3); // Output: false
 ```
 
+### Compare relative path to another by segment
+Compare the path segments of the current URL to another relative path
+```ts
+const url: UrlBuilder = UrlBuilder.createFromUrl('/users/10/comments');
+url.compareToPathBySegment('/users/10/comments') // Output: true
+const url2: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
+url2.compareToPathBySegment('/users/10/comments') // Output: false
+const url3: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments').addParam('id', 10);
+url3.compareToPathBySegment('/users/10/comments') // Output: true
+// Or, validate unfilled params
+const url4: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
+url4.compareToPathBySegment('/users/10/comments', true) // Output: true
+```
+
 ### Get word between two others
 Compare the current URL to another URL (UrlBuilder instance)
 ```ts
@@ -268,6 +282,7 @@ static createFromUrl(baseUrl: string): UrlBuilder
 static splitPath(path: string): string[]
 static trimPath(path: string): string
 compareTo(url: UrlBuilder, relative = true): boolean
+compareToPathBySegment(path: string, validateUnfilledParams = false): boolean
 getScheme(): Scheme
 setScheme(scheme: Scheme): UrlBuilder
 getHost(): string

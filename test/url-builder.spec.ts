@@ -1,5 +1,5 @@
-import {UrlBuilder} from "../src";
-import {Scheme} from "../src/enums/scheme.enum";
+import { UrlBuilder } from "../src";
+import { Scheme } from "../src/enums/scheme.enum";
 
 describe('UrlBuilder', () => {
     const base_url = 'https://localhost';
@@ -45,6 +45,23 @@ describe('UrlBuilder', () => {
 
         expect(url.compareTo(url3)).toBe(false);
         expect(url.compareTo(url3, false)).toBe(false);
+    });
+
+    test('should compare segments', () => {
+        const url: UrlBuilder = UrlBuilder.createFromUrl('/user');
+        expect(url.compareToPathBySegment(path_user_comments)).toBe(false);
+
+        const url2: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        expect(url2.compareToPathBySegment('/users')).toBe(false);
+
+        const url3: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        expect(url3.compareToPathBySegment(path_user_comments)).toBe(true);
+
+        const url4: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
+        expect(url4.compareToPathBySegment(path_user_comments)).toBe(false);
+
+        const url5: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
+        expect(url5.compareToPathBySegment(path_user_comments, true)).toBe(true);
     });
 
     test('should set scheme', () => {
@@ -121,7 +138,7 @@ describe('UrlBuilder', () => {
     });
 
     test('should set the same params', () => {
-        const map = new Map<string, string|number>()
+        const map = new Map<string, string | number>()
             .set('userId', 10).set('commentId', 1);
 
         const url: UrlBuilder = new UrlBuilder()
@@ -166,7 +183,7 @@ describe('UrlBuilder', () => {
     });
 
     test('should set the same queries', () => {
-        const map = new Map<string, string|number>()
+        const map = new Map<string, string | number>()
             .set('page', 1).set('order', 'ASC');
 
         const url: UrlBuilder = new UrlBuilder()
@@ -222,11 +239,11 @@ describe('UrlBuilder', () => {
         expect(url.getParent(3).getRelativePath()).toBe('/users');
     });
 
-    test('should get path between two words', () => {
+    test('should get path between two segments', () => {
         const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
 
-        expect(url.getBetween2Words('users', 'comments')).toBe('10');
-        expect(url.getBetween2Words('user', 'comment')).toBe(null);
+        expect(url.getBetween2Segments('users', 'comments')).toBe('10');
+        expect(url.getBetween2Segments('user', 'comment')).toBe(null);
     });
 
     test('should get empty relative path', () => {
