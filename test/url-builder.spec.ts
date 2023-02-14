@@ -194,6 +194,31 @@ describe('UrlBuilder', () => {
     });
 
     test('should parse fragment', () => {
+        const url: UrlBuilder = UrlBuilder
+            .createFromUrl(base_url + '/books/719888217.html')
+        const url2: UrlBuilder = UrlBuilder
+            .createFromUrl(base_url + '/books/719888217.html', true)
+        const url3: UrlBuilder = UrlBuilder
+            .createFromUrl(base_url + '/books', true)
+
+        expect(url.getFile()).toBeFalsy();
+        expect(url.getPathSegments().length).toBe(2);
+        expect(url2.getFile().name).toBe('719888217');
+        expect(url2.getFile().ext).toBe('html');
+        expect(url2.getPathSegments().length).toBe(1);
+        expect(url3.getFile()).toBeFalsy();
+    });
+
+    test('should set setFile', () => {
+        const url: UrlBuilder = UrlBuilder
+            .createFromUrl(base_url)
+            .setFile('719888217.html');
+
+        expect(url.getFile().name).toBe('719888217');
+        expect(url.getFile().ext).toBe('html');
+    });
+
+    test('should parse fragment', () => {
         const url: UrlBuilder = UrlBuilder.createFromUrl(url_users_paginated_with_port + '#foo');
 
         expect(url.getFragment()).toBe('foo');

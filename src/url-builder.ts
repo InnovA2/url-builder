@@ -1,6 +1,7 @@
 import * as urlParser from 'url-parse';
 import { Scheme } from './enums/scheme.enum';
 import { UrlConstants } from './url.constants';
+import { FileInterface } from './file.interface';
 
 export class UrlBuilder {
     private scheme = Scheme.HTTPS;
@@ -10,12 +11,14 @@ export class UrlBuilder {
     private params = new Map<string, string | number | boolean>();
     private query = new Map<string, string | number | boolean>();
     private fragment: string;
+    private file: FileInterface;
 
     /**
      * Create UrlBuilder instance from string url
      * @param baseUrl
+     * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
-    static createFromUrl(baseUrl: string): UrlBuilder {
+    static createFromUrl(baseUrl: string, isFile = false): UrlBuilder {
         const url = new UrlBuilder();
 
         const items = urlParser(baseUrl, true);
@@ -30,7 +33,14 @@ export class UrlBuilder {
             url.port = +items.port;
         }
 
-        url.pathSegments = this.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
+        const segments = this.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
+        if (isFile && segments.length > 0 && segments[segments.length - 1]) {
+            url.file = this.parseFile(segments[segments.length - 1]);
+            if (url.file) {
+                segments.splice(-1);
+            }
+        }
+        url.pathSegments = segments;
 
         if (items.query) {
             for (const [key, value] of Object.entries(items.query)) {
@@ -202,6 +212,15 @@ export class UrlBuilder {
         return this;
     }
 
+    setFile(filename: string): UrlBuilder {
+        this.file = UrlBuilder.parseFile(filename);
+        return this;
+    }
+
+    getFile(): FileInterface {
+        return this.file;
+    }
+
     getFragment(): string {
         return this.fragment;
     }
@@ -319,5 +338,16 @@ export class UrlBuilder {
         return [baseUrl, this.getRelativePath(), this.getQueryString()]
             .filter(item => item)
             .join('');
+    }
+
+    private static parseFile(filename: string): FileInterface {
+        const matchType = filename.match(UrlConstants.REGEX_FILENAME);
+        if (matchType && matchType.length > 2) {
+            return {
+                name: matchType[1],
+                ext: matchType[2].replace(/\./, '')
+            };
+        }
+        return null;
     }
 }
