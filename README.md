@@ -9,6 +9,8 @@ A lightweight library with many features to easy build URLs
   - [Create from existing URL](#create-from-existing-url)
   - [Handle path](#handle-path)
   - [Handle query param](#handle-query-param)
+  - [Handle file](#handle-file)
+  - [Handle fragment](#handle-fragment)
   - [Work with parent](#work-with-parent)
   - [Get relative path](#get-relative-path)
   - [Get query params in string](#get-query-params-in-string)
@@ -140,6 +142,40 @@ url.addQueryParams({ page: 4, order: 'ASC' });
 url.addOrReplaceQueryParams({ page: 4, order: 'ASC' });
 // QueryParam 'page' is now : 4
 // QueryParam 'order' is now : ASC
+```
+
+### Handle file
+Parse file in url
+```ts
+// Consider file part of path segments
+const url = UrlBuilder.createFromUrl('http://localhost/users/10.html');
+url.getRelativePath();
+// Output : /users/10.html
+url.getPathSegments();
+// Output : ['users', '10.html'];
+url.getFile();
+// Output : undefined
+
+// Consider file dissociated of path segments
+const url2 = UrlBuilder.createFromUrl('http://localhost/users/10.html', true);
+url2.getRelativePath();
+// Output : /users/10.html
+url2.getPathSegments();
+// Output : ['users'];
+url2.getFile();
+// Output : { name: '10', ext: 'html' }
+```
+Define file
+```ts
+url.setFile({ name: 'mycover', ext: 'webp' });
+url.getFile();
+// Output : { name: 'mycover', ext: 'webp' }
+```
+Define file from filename
+```ts
+url.setFilename('mycover.webp');
+url.getFile();
+// Output : { name: 'mycover', ext: 'webp' }
 ```
 
 ### Handle fragment
@@ -305,6 +341,11 @@ setQueryParams(query: Map<string, string | number>): UrlBuilder
 addQueryParam(key: string, value: string | number): UrlBuilder
 addQueryParams(queries: Record<string, string | number>): UrlBuilder
 getQueryParams(): Map<string, string | number>
+setFilename(filename: string): UrlBuilder
+setFile(file: FileInterface): UrlBuilder
+getFile(): FileInterface
+getFragment(): string
+setFragment(fragment: string): UrlBuilder
 mergePathWith(url: UrlBuilder): UrlBuilder
 getFirstPath(): string
 getLastPath(): string

@@ -212,8 +212,13 @@ export class UrlBuilder {
         return this;
     }
 
-    setFile(filename: string): UrlBuilder {
+    setFilename(filename: string): UrlBuilder {
         this.file = UrlBuilder.parseFile(filename);
+        return this;
+    }
+
+    setFile(file: FileInterface): UrlBuilder {
+        this.file = file;
         return this;
     }
 
@@ -236,8 +241,9 @@ export class UrlBuilder {
      */
     mergePathWith(url: UrlBuilder): UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
-        this.setParams(new Map([...this.params.entries(), ...url.params.entries()]))
-        this.setQueryParams(new Map([...this.query.entries(), ...url.query.entries()]))
+        this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
+        this.setQueryParams(new Map([...this.query.entries(), ...url.query.entries()]));
+        this.setFile(url.getFile());
 
         return this;
     }
@@ -307,8 +313,9 @@ export class UrlBuilder {
 
         const relativePath = paths.length ? (UrlConstants.URL_PATH_SEPARATOR + paths.join(UrlConstants.URL_PATH_SEPARATOR)) : '';
         const queryString = this.getQueryString();
+        const filename = this.file ? [this.file.name, this.file.ext].join(UrlConstants.URL_EXT_SEPARATOR) : '';
 
-        const url = withQuery && queryString ? relativePath + queryString : relativePath;
+        const url = withQuery && queryString ? (relativePath + filename + queryString) : (relativePath + filename);
         return withFragment ? `${url}#${this.fragment}` : url;
     }
 

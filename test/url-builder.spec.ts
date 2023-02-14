@@ -209,10 +209,19 @@ describe('UrlBuilder', () => {
         expect(url3.getFile()).toBeFalsy();
     });
 
+    test('should set setFilename', () => {
+        const url: UrlBuilder = UrlBuilder
+            .createFromUrl(base_url)
+            .setFilename('719888217.html');
+
+        expect(url.getFile().name).toBe('719888217');
+        expect(url.getFile().ext).toBe('html');
+    });
+
     test('should set setFile', () => {
         const url: UrlBuilder = UrlBuilder
             .createFromUrl(base_url)
-            .setFile('719888217.html');
+            .setFile({ name: '719888217', ext: 'html' });
 
         expect(url.getFile().name).toBe('719888217');
         expect(url.getFile().ext).toBe('html');
