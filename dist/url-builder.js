@@ -14,8 +14,9 @@ class UrlBuilder {
     /**
      * Create UrlBuilder instance from string url
      * @param baseUrl
+     * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
-    static createFromUrl(baseUrl) {
+    static createFromUrl(baseUrl, isFile = false) {
         const url = new UrlBuilder();
         const items = urlParser(baseUrl, true);
         if (items.protocol) {
@@ -25,7 +26,14 @@ class UrlBuilder {
         if (items.port) {
             url.port = +items.port;
         }
-        url.pathSegments = this.splitPath(items.pathname.replace(url_constants_1.UrlConstants.REGEX_BRACE_PARAMS, `${url_constants_1.UrlConstants.URL_PATH_PREFIX}$2`));
+        const segments = this.splitPath(items.pathname.replace(url_constants_1.UrlConstants.REGEX_BRACE_PARAMS, `${url_constants_1.UrlConstants.URL_PATH_PREFIX}$2`));
+        if (isFile && segments.length > 0 && segments[segments.length - 1]) {
+            url.file = this.parseFile(segments[segments.length - 1]);
+            if (url.file) {
+                segments.splice(-1);
+            }
+        }
+        url.pathSegments = segments;
         if (items.query) {
             for (const [key, value] of Object.entries(items.query)) {
                 url.query.set(key, String(value));
@@ -167,6 +175,17 @@ class UrlBuilder {
         }
         return this;
     }
+    setFilename(filename) {
+        this.file = UrlBuilder.parseFile(filename);
+        return this;
+    }
+    setFile(file) {
+        this.file = file;
+        return this;
+    }
+    getFile() {
+        return this.file;
+    }
     getFragment() {
         return this.fragment;
     }
@@ -182,6 +201,7 @@ class UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
         this.setQueryParams(new Map([...this.query.entries(), ...url.query.entries()]));
+        this.setFile(url.getFile());
         return this;
     }
     /**
@@ -238,7 +258,8 @@ class UrlBuilder {
         }
         const relativePath = paths.length ? (url_constants_1.UrlConstants.URL_PATH_SEPARATOR + paths.join(url_constants_1.UrlConstants.URL_PATH_SEPARATOR)) : '';
         const queryString = this.getQueryString();
-        const url = withQuery && queryString ? relativePath + queryString : relativePath;
+        const filename = this.file ? [this.file.name, this.file.ext].join(url_constants_1.UrlConstants.URL_EXT_SEPARATOR) : '';
+        const url = withQuery && queryString ? (relativePath + filename + queryString) : (relativePath + filename);
         return withFragment ? `${url}#${this.fragment}` : url;
     }
     /**
@@ -262,6 +283,16 @@ class UrlBuilder {
         return [baseUrl, this.getRelativePath(), this.getQueryString()]
             .filter(item => item)
             .join('');
+    }
+    static parseFile(filename) {
+        const matchType = filename.match(url_constants_1.UrlConstants.REGEX_FILENAME);
+        if (matchType && matchType.length > 2) {
+            return {
+                name: matchType[1],
+                ext: matchType[2].replace(/\./, '')
+            };
+        }
+        return null;
     }
 }
 exports.UrlBuilder = UrlBuilder;

@@ -1,4 +1,5 @@
 import { Scheme } from './enums/scheme.enum';
+import { FileInterface } from './file.interface';
 export declare class UrlBuilder {
     private scheme;
     private host;
@@ -7,11 +8,13 @@ export declare class UrlBuilder {
     private params;
     private query;
     private fragment;
+    private file;
     /**
      * Create UrlBuilder instance from string url
      * @param baseUrl
+     * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
-    static createFromUrl(baseUrl: string): UrlBuilder;
+    static createFromUrl(baseUrl: string, isFile?: boolean): UrlBuilder;
     /**
      * Split path in segments by slash
      * @param path relative path to split
@@ -55,6 +58,9 @@ export declare class UrlBuilder {
     addOrReplaceQueryParam(key: string, value: string | number | boolean): UrlBuilder;
     addQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder;
     addOrReplaceQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder;
+    setFilename(filename: string): UrlBuilder;
+    setFile(file: FileInterface): UrlBuilder;
+    getFile(): FileInterface;
     getFragment(): string;
     setFragment(fragment: string): UrlBuilder;
     /**
@@ -95,4 +101,5 @@ export declare class UrlBuilder {
      * Convert full UrlBuilder to string url
      */
     toString(): string;
+    private static parseFile;
 }
