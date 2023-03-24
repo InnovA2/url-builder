@@ -252,14 +252,14 @@ export class UrlBuilder {
      * Get first path segment
      */
     getFirstPath(): string {
-        return this.pathSegments[0];
+        return this.pathSegments.length ? this.pathSegments[0] : null;
     }
 
     /**
      * Get last path segment
      */
     getLastPath(): string {
-        return this.pathSegments[this.pathSegments.length - 1];
+        return this.pathSegments.length ? this.pathSegments[this.pathSegments.length - 1] : null;
     }
 
     /**
