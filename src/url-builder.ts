@@ -81,8 +81,8 @@ export class UrlBuilder {
     }
 
     /**
-     * Compare current path to unfilled path parameters
-     * @param path final relative path (e.g. /users/:id/groups)
+     * Compare the current path to another one, taking into account or not parameters
+     * @param path relative path to compare to (e.g. /users/10/groups or /users/:id/groups)
      * @param validateUnfilledParams true to validate params unfilled from currentUrl (e.g. /users/:id/groups)
      */
     compareToPathBySegment(path: string, validateUnfilledParams = false): boolean {
