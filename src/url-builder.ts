@@ -3,6 +3,7 @@ import { Scheme } from './enums/scheme.enum';
 import { UrlConstants } from './url.constants';
 import { FileInterface } from './file.interface';
 import { ParamFindPredicate, ParamType } from './types';
+import { UrlUtils } from './url.utils';
 
 export class UrlBuilder {
     private scheme = Scheme.HTTPS;
@@ -10,7 +11,7 @@ export class UrlBuilder {
     private port: number;
     private pathSegments: string[] = [];
     private params = new Map<string, ParamType>();
-    private query = new Map<string, ParamType>();
+    private queryParams = new Map<string, ParamType>();
     private fragment: string;
     private file: FileInterface;
 
@@ -34,9 +35,9 @@ export class UrlBuilder {
             url.port = +items.port;
         }
 
-        const segments = this.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
+        const segments = UrlUtils.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
         if (isFile && segments.length > 0 && segments[segments.length - 1]) {
-            url.file = this.parseFile(segments[segments.length - 1]);
+            url.file = UrlUtils.parseFile(segments[segments.length - 1]);
             if (url.file) {
                 segments.splice(-1);
             }
@@ -45,7 +46,7 @@ export class UrlBuilder {
 
         if (items.query) {
             for (const [key, value] of Object.entries(items.query)) {
-                url.query.set(key, String(value));
+                url.queryParams.set(key, String(value));
             }
         }
 
@@ -55,21 +56,21 @@ export class UrlBuilder {
     }
 
     /**
-     * Split path in segments by slash
+     * Split path in segments by slash.
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.splitPath()** instead.
      * @param path relative path to split
      */
     static splitPath(path: string): string[] {
-        return path.split(UrlConstants.URL_PATH_SEPARATOR)
-            .filter(segment => segment)
-            .map(segment => segment.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
+        return UrlUtils.splitPath(path);
     }
 
     /**
-     * Trim path (e.g. /users/:id/ -> user/:id)
+     * Trim path (e.g. /users/:id/ -> user/:id).
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.trimPath()** instead.
      * @param path relative path to trim
      */
     static trimPath(path: string): string {
-        return this.splitPath(path).join(UrlConstants.URL_PATH_SEPARATOR);
+        return UrlUtils.trimPath(path);
     }
 
     /**
@@ -87,7 +88,7 @@ export class UrlBuilder {
      * @param validateUnfilledParams true to validate params unfilled from currentUrl (e.g. /users/:id/groups)
      */
     compareToPathBySegment(path: string, validateUnfilledParams = false): boolean {
-        const pathSegments = UrlBuilder.splitPath(path);
+        const pathSegments = UrlUtils.splitPath(path);
         const matches = this.pathSegments.map((segment, i) => {
             if (!pathSegments[i]) {
                 return false;
@@ -139,7 +140,7 @@ export class UrlBuilder {
     }
 
     addPath(path: string, params?: Record<string, ParamType>): UrlBuilder {
-        this.pathSegments.push(...UrlBuilder.splitPath(path));
+        this.pathSegments.push(...UrlUtils.splitPath(path));
         return params ? this.addParams(params) : this;
     }
 
@@ -183,27 +184,27 @@ export class UrlBuilder {
     }
 
     getQueryParams(): Map<string, ParamType> {
-        return this.query;
+        return this.queryParams;
     }
 
     findQueryParams(predicate: ParamFindPredicate): Map<string, ParamType> {
-        return new Map([...this.query].filter(predicate));
+        return new Map([...this.queryParams].filter(predicate));
     }
 
     setQueryParams(query: Map<string, ParamType>): UrlBuilder {
-        this.query = query;
+        this.queryParams = query;
         return this;
     }
 
     addQueryParam(key: string, value: ParamType): UrlBuilder {
-        if (!this.query.has(key)) {
-            this.query.set(key, value);
+        if (!this.queryParams.has(key)) {
+            this.queryParams.set(key, value);
         }
         return this;
     }
 
     addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder {
-        this.query.set(key, value);
+        this.queryParams.set(key, value);
         return this;
     }
 
@@ -216,13 +217,13 @@ export class UrlBuilder {
 
     addOrReplaceQueryParams(queries: Record<string, ParamType>): UrlBuilder {
         for (const [key, value] of Object.entries(queries)) {
-            this.query.set(key, value);
+            this.queryParams.set(key, value);
         }
         return this;
     }
 
     setFilename(filename: string): UrlBuilder {
-        this.file = UrlBuilder.parseFile(filename);
+        this.file = UrlUtils.parseFile(filename);
         return this;
     }
 
@@ -251,7 +252,7 @@ export class UrlBuilder {
     mergePathWith(url: UrlBuilder): UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
-        this.setQueryParams(new Map([...this.query.entries(), ...url.query.entries()]));
+        this.setQueryParams(new Map([...this.queryParams.entries(), ...url.queryParams.entries()]));
         this.setFile(url.getFile());
 
         return this;
@@ -260,15 +261,31 @@ export class UrlBuilder {
     /**
      * Get first path segment
      */
-    getFirstPath(): string {
+    getFirstPathSegment(): string {
         return this.pathSegments.length ? this.pathSegments[0] : null;
+    }
+
+    /**
+     * Get first path segment.
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getFirstPathSegment()** instead.
+     */
+    getFirstPath(): string {
+        return this.getFirstPathSegment();
     }
 
     /**
      * Get last path segment
      */
-    getLastPath(): string {
+    getLastPathSegment(): string {
         return this.pathSegments.length ? this.pathSegments[this.pathSegments.length - 1] : null;
+    }
+
+    /**
+     * Get last path segment
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getLastPathSegment()** instead.
+     */
+    getLastPath(): string {
+        return this.getLastPathSegment();
     }
 
     /**
@@ -281,7 +298,7 @@ export class UrlBuilder {
 
         parent.pathSegments.filter(path => path !== lastPath);
         parent.params.delete(lastPath.replace(UrlConstants.URL_PATH_PREFIX, ''));
-        parent.query = new Map<string, ParamType>();
+        parent.queryParams = new Map<string, ParamType>();
 
         return n > 1 ? parent.getParent(n - 1) : parent;
     }
@@ -303,7 +320,7 @@ export class UrlBuilder {
 
     /**
      * Get relative path
-     * @param withQuery true to get query params
+     * @param withQuery true to get queryParams params
      * @param withFragment true to get fragment
      */
     getRelativePath(withQuery = false, withFragment = false): string {
@@ -329,12 +346,12 @@ export class UrlBuilder {
     }
 
     /**
-     * Get query params as string
+     * Get queryParams params as string
      */
     getQueryString(): string {
         const queryParams: string[] = [];
 
-        this.query.forEach((value, key) => {
+        this.queryParams.forEach((value, key) => {
             queryParams.push([key, value].join('='));
         });
 
@@ -354,16 +371,5 @@ export class UrlBuilder {
         return [baseUrl, this.getRelativePath(), this.getQueryString()]
             .filter(item => item)
             .join('');
-    }
-
-    private static parseFile(filename: string): FileInterface {
-        const matchType = filename.match(UrlConstants.REGEX_FILENAME);
-        if (matchType && matchType.length > 2) {
-            return {
-                name: matchType[1],
-                ext: matchType[2].replace(/\./, '')
-            };
-        }
-        return null;
     }
 }

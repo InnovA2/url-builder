@@ -29,6 +29,11 @@ describe('UrlBuilder', () => {
         expect(url.toString()).toBe(url_users_paginated_with_port + '&order=DESC');
     });
 
+    test('should split path', () => {
+        const segments = UrlBuilder.splitPath(path_user_comments);
+        expect(segments).toEqual(['users', '10', 'comments']);
+    });
+
     test('should trim path', () => {
         const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
 
