@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>369/369</span>
+                <span class='fraction'>375/375</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.05% </span>
+                <span class="strong">96.93% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>99/102</span>
+                <span class='fraction'>95/98</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>43/43</span>
+                <span class='fraction'>44/44</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>369/369</span>
+                <span class='fraction'>375/375</span>
             </div>
         
             
@@ -432,7 +432,14 @@
 <a name='L367'></a><a href='#L367'>367</a>
 <a name='L368'></a><a href='#L368'>368</a>
 <a name='L369'></a><a href='#L369'>369</a>
-<a name='L370'></a><a href='#L370'>370</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -493,10 +500,10 @@
 <span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
-<span class="cline-any cline-yes">43x</span>
-<span class="cline-any cline-yes">43x</span>
-<span class="cline-any cline-yes">43x</span>
-<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
@@ -697,6 +704,22 @@
 <span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-yes">46x</span>
@@ -790,22 +813,12 @@
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">46x</span>
-<span class="cline-any cline-yes">46x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as urlParser from 'url-parse';
 import { Scheme } from './enums/scheme.enum';
 import { UrlConstants } from './url.constants';
 import { FileInterface } from './file.interface';
 import { ParamFindPredicate, ParamType } from './types';
+import { UrlUtils } from './url.utils';
 &nbsp;
 export class UrlBuilder {
     private scheme = Scheme.HTTPS;
@@ -813,7 +826,7 @@ export class UrlBuilder {
     private port: number;
     private pathSegments: string[] = [];
     private params = new Map&lt;string, ParamType&gt;();
-    private query = new Map&lt;string, ParamType&gt;();
+    private queryParams = new Map&lt;string, ParamType&gt;();
     private fragment: string;
     private file: FileInterface;
 &nbsp;
@@ -837,9 +850,9 @@ export class UrlBuilder {
             url.port = +items.port;
         }
 &nbsp;
-        const segments = this.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
+        const segments = UrlUtils.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
         if (isFile &amp;&amp; segments.length &gt; 0 &amp;&amp; segments[segments.length - 1]) {
-            url.file = this.parseFile(segments[segments.length - 1]);
+            url.file = UrlUtils.parseFile(segments[segments.length - 1]);
             if (url.file) {
                 segments.splice(-1);
             }
@@ -848,7 +861,7 @@ export class UrlBuilder {
 &nbsp;
         if (items.query) {
             for (const [key, value] of Object.entries(items.query)) {
-                url.query.set(key, String(value));
+                url.queryParams.set(key, String(value));
             }
         }
 &nbsp;
@@ -858,21 +871,21 @@ export class UrlBuilder {
     }
 &nbsp;
     /**
-     * Split path in segments by slash
+     * Split path in segments by slash.
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.splitPath()** instead.
      * @param path relative path to split
      */
     static splitPath(path: string): string[] {
-        return path.split(UrlConstants.URL_PATH_SEPARATOR)
-            .filter(segment =&gt; segment)
-            .map(segment =&gt; segment.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
+        return UrlUtils.splitPath(path);
     }
 &nbsp;
     /**
-     * Trim path (e.g. /users/:id/ -&gt; user/:id)
+     * Trim path (e.g. /users/:id/ -&gt; user/:id).
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.trimPath()** instead.
      * @param path relative path to trim
      */
     static trimPath(path: string): string {
-        return this.splitPath(path).join(UrlConstants.URL_PATH_SEPARATOR);
+        return UrlUtils.trimPath(path);
     }
 &nbsp;
     /**
@@ -890,7 +903,7 @@ export class UrlBuilder {
      * @param validateUnfilledParams true to validate params unfilled from currentUrl (e.g. /users/:id/groups)
      */
     compareToPathBySegment(path: string, validateUnfilledParams = false): boolean {
-        const pathSegments = UrlBuilder.splitPath(path);
+        const pathSegments = UrlUtils.splitPath(path);
         const matches = this.pathSegments.map((segment, i) =&gt; {
             if (!pathSegments[i]) {
                 return false;
@@ -942,7 +955,7 @@ export class UrlBuilder {
     }
 &nbsp;
     addPath(path: string, params?: Record&lt;string, ParamType&gt;): UrlBuilder {
-        this.pathSegments.push(...UrlBuilder.splitPath(path));
+        this.pathSegments.push(...UrlUtils.splitPath(path));
         return params ? this.addParams(params) : this;
     }
 &nbsp;
@@ -986,27 +999,27 @@ export class UrlBuilder {
     }
 &nbsp;
     getQueryParams(): Map&lt;string, ParamType&gt; {
-        return this.query;
+        return this.queryParams;
     }
 &nbsp;
     findQueryParams(predicate: ParamFindPredicate): Map&lt;string, ParamType&gt; {
-        return new Map([...this.query].filter(predicate));
+        return new Map([...this.queryParams].filter(predicate));
     }
 &nbsp;
     setQueryParams(query: Map&lt;string, ParamType&gt;): UrlBuilder {
-        this.query = query;
+        this.queryParams = query;
         return this;
     }
 &nbsp;
     addQueryParam(key: string, value: ParamType): UrlBuilder {
-        if (!this.query.has(key)) {
-            this.query.set(key, value);
+        if (!this.queryParams.has(key)) {
+            this.queryParams.set(key, value);
         }
         return this;
     }
 &nbsp;
     addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder {
-        this.query.set(key, value);
+        this.queryParams.set(key, value);
         return this;
     }
 &nbsp;
@@ -1019,13 +1032,13 @@ export class UrlBuilder {
 &nbsp;
     addOrReplaceQueryParams(queries: Record&lt;string, ParamType&gt;): UrlBuilder {
         for (const [key, value] of Object.entries(queries)) {
-            this.query.set(key, value);
+            this.queryParams.set(key, value);
         }
         return this;
     }
 &nbsp;
     setFilename(filename: string): UrlBuilder {
-        this.file = UrlBuilder.parseFile(filename);
+        this.file = UrlUtils.parseFile(filename);
         return this;
     }
 &nbsp;
@@ -1054,7 +1067,7 @@ export class UrlBuilder {
     mergePathWith(url: UrlBuilder): UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
-        this.setQueryParams(new Map([...this.query.entries(), ...url.query.entries()]));
+        this.setQueryParams(new Map([...this.queryParams.entries(), ...url.queryParams.entries()]));
         this.setFile(url.getFile());
 &nbsp;
         return this;
@@ -1063,15 +1076,31 @@ export class UrlBuilder {
     /**
      * Get first path segment
      */
-    getFirstPath(): string {
+    getFirstPathSegment(): string {
         return this.pathSegments.length ? this.pathSegments[0] <span class="branch-0 cbranch-no" title="branch not covered" >: null;</span>
+    }
+&nbsp;
+    /**
+     * Get first path segment.
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getFirstPathSegment()** instead.
+     */
+    getFirstPath(): string {
+        return this.getFirstPathSegment();
     }
 &nbsp;
     /**
      * Get last path segment
      */
-    getLastPath(): string {
+    getLastPathSegment(): string {
         return this.pathSegments.length ? this.pathSegments[this.pathSegments.length - 1] <span class="branch-0 cbranch-no" title="branch not covered" >: null;</span>
+    }
+&nbsp;
+    /**
+     * Get last path segment
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getLastPathSegment()** instead.
+     */
+    getLastPath(): string {
+        return this.getLastPathSegment();
     }
 &nbsp;
     /**
@@ -1084,7 +1113,7 @@ export class UrlBuilder {
 &nbsp;
         parent.pathSegments.filter(path =&gt; path !== lastPath);
         parent.params.delete(lastPath.replace(UrlConstants.URL_PATH_PREFIX, ''));
-        parent.query = new Map&lt;string, ParamType&gt;();
+        parent.queryParams = new Map&lt;string, ParamType&gt;();
 &nbsp;
         return n &gt; 1 ? parent.getParent(n - 1) : parent;
     }
@@ -1106,7 +1135,7 @@ export class UrlBuilder {
 &nbsp;
     /**
      * Get relative path
-     * @param withQuery true to get query params
+     * @param withQuery true to get queryParams params
      * @param withFragment true to get fragment
      */
     getRelativePath(withQuery = false, withFragment = false): string {
@@ -1132,12 +1161,12 @@ export class UrlBuilder {
     }
 &nbsp;
     /**
-     * Get query params as string
+     * Get queryParams params as string
      */
     getQueryString(): string {
         const queryParams: string[] = [];
 &nbsp;
-        this.query.forEach((value, key) =&gt; {
+        this.queryParams.forEach((value, key) =&gt; {
             queryParams.push([key, value].join('='));
         });
 &nbsp;
@@ -1158,17 +1187,6 @@ export class UrlBuilder {
             .filter(item =&gt; item)
             .join('');
     }
-&nbsp;
-    private static parseFile(filename: string): FileInterface {
-        const matchType = filename.match(UrlConstants.REGEX_FILENAME);
-        if (matchType &amp;&amp; matchType.length &gt; 2) {
-            return {
-                name: matchType[1],
-                ext: matchType[2].replace(/\./, '')
-            };
-        }
-        return null;
-    }
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -1177,7 +1195,7 @@ export class UrlBuilder {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-03-25T09:50:08.527Z
+                at 2023-03-25T11:24:44.509Z
             </div>
         <script src="../prettify.js"></script>
         <script>

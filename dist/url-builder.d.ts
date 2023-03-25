@@ -1,12 +1,13 @@
 import { Scheme } from './enums/scheme.enum';
 import { FileInterface } from './file.interface';
+import { ParamFindPredicate, ParamType } from './types';
 export declare class UrlBuilder {
     private scheme;
     private host;
     private port;
     private pathSegments;
     private params;
-    private query;
+    private queryParams;
     private fragment;
     private file;
     /**
@@ -16,12 +17,14 @@ export declare class UrlBuilder {
      */
     static createFromUrl(baseUrl: string, isFile?: boolean): UrlBuilder;
     /**
-     * Split path in segments by slash
+     * Split path in segments by slash.
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.splitPath()** instead.
      * @param path relative path to split
      */
     static splitPath(path: string): string[];
     /**
-     * Trim path (e.g. /users/:id/ -> user/:id)
+     * Trim path (e.g. /users/:id/ -> user/:id).
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.trimPath()** instead.
      * @param path relative path to trim
      */
     static trimPath(path: string): string;
@@ -32,8 +35,8 @@ export declare class UrlBuilder {
      */
     compareTo(url: UrlBuilder, relative?: boolean): boolean;
     /**
-     * Compare current path to unfilled path parameters
-     * @param path final relative path (e.g. /users/:id/groups)
+     * Compare the current path to another one, taking into account or not parameters
+     * @param path relative path to compare to (e.g. /users/10/groups or /users/:id/groups)
      * @param validateUnfilledParams true to validate params unfilled from currentUrl (e.g. /users/:id/groups)
      */
     compareToPathBySegment(path: string, validateUnfilledParams?: boolean): boolean;
@@ -44,20 +47,22 @@ export declare class UrlBuilder {
     getPort(): number;
     setPort(port: number): UrlBuilder;
     getPathSegments(): string[];
-    setPathSegments(segments: string[], params?: Record<string, string | number | boolean>): UrlBuilder;
-    addPath(path: string, params?: Record<string, string | number | boolean>): UrlBuilder;
-    getParams(): Map<string, string | number | boolean>;
-    setParams(params: Map<string, string | number | boolean>): UrlBuilder;
-    addParam(key: string, value: string | number | boolean): UrlBuilder;
-    addOrReplaceParam(key: string, value: string | number | boolean): UrlBuilder;
-    addParams(params: Record<string, string | number | boolean>): UrlBuilder;
-    addOrReplaceParams(params: Record<string, string | number | boolean>): UrlBuilder;
-    getQueryParams(): Map<string, string | number | boolean>;
-    setQueryParams(query: Map<string, string | number | boolean>): UrlBuilder;
-    addQueryParam(key: string, value: string | number | boolean): UrlBuilder;
-    addOrReplaceQueryParam(key: string, value: string | number | boolean): UrlBuilder;
-    addQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder;
-    addOrReplaceQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder;
+    setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder;
+    addPath(path: string, params?: Record<string, ParamType>): UrlBuilder;
+    getParams(): Map<string, ParamType>;
+    findParams(predicate: ParamFindPredicate): Map<string, ParamType>;
+    setParams(params: Map<string, ParamType>): UrlBuilder;
+    addParam(key: string, value: ParamType): UrlBuilder;
+    addOrReplaceParam(key: string, value: ParamType): UrlBuilder;
+    addParams(params: Record<string, ParamType>): UrlBuilder;
+    addOrReplaceParams(params: Record<string, ParamType>): UrlBuilder;
+    getQueryParams(): Map<string, ParamType>;
+    findQueryParams(predicate: ParamFindPredicate): Map<string, ParamType>;
+    setQueryParams(query: Map<string, ParamType>): UrlBuilder;
+    addQueryParam(key: string, value: ParamType): UrlBuilder;
+    addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder;
+    addQueryParams(queries: Record<string, ParamType>): UrlBuilder;
+    addOrReplaceQueryParams(queries: Record<string, ParamType>): UrlBuilder;
     setFilename(filename: string): UrlBuilder;
     setFile(file: FileInterface): UrlBuilder;
     getFile(): FileInterface;
@@ -71,9 +76,19 @@ export declare class UrlBuilder {
     /**
      * Get first path segment
      */
+    getFirstPathSegment(): string;
+    /**
+     * Get first path segment.
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getFirstPathSegment()** instead.
+     */
     getFirstPath(): string;
     /**
      * Get last path segment
+     */
+    getLastPathSegment(): string;
+    /**
+     * Get last path segment
+     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getLastPathSegment()** instead.
      */
     getLastPath(): string;
     /**
@@ -89,17 +104,16 @@ export declare class UrlBuilder {
     getBetween2Segments(a: string, b: string): string;
     /**
      * Get relative path
-     * @param withQuery true to get query params
+     * @param withQuery true to get queryParams params
      * @param withFragment true to get fragment
      */
     getRelativePath(withQuery?: boolean, withFragment?: boolean): string;
     /**
-     * Get query params as string
+     * Get queryParams params as string
      */
     getQueryString(): string;
     /**
      * Convert full UrlBuilder to string url
      */
     toString(): string;
-    private static parseFile;
 }
