@@ -1,6 +1,6 @@
 {
   "name": "@innova2/url-builder",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "A lightweight library with many feature to easy build URLs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "jest",
     "test:cov": "jest --coverage && make-coverage-badge",
-    "build-publish": "npm run test:cov && tsc && git add coverage/. dist/. && npm version %npm_config_releaseVersion% -f && npm publish --access=public && git push origin main"
+    "release": "npm run test:cov && tsc && git add coverage/. dist/. && npm version %npm_config_releaseVersion% -f && npm publish --access=public && git push origin main --tags"
   },
   "dependencies": {
     "url-parse": "^1.5.10"
