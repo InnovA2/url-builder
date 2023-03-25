@@ -13,13 +13,15 @@ A lightweight library with many features to easy build URLs
   - [Handle fragment](#handle-fragment)
   - [Work with parent](#work-with-parent)
   - [Get relative path](#get-relative-path)
-  - [Get query params in string](#get-query-params-in-string)
+  - [Get query params in string](#get-query-params-as-string)
   - [Convert full URL to string](#convert-full-url-to-string)
 - [Advanced](#memo-advanced)
   - [Compare URL to another](#compare-url-to-another)
-  - [Get word between two others](#get-word-between-two-others)
-  - [Split path from string (static)](#split-path-from-string-static)
-  - [Trim path from string (static)](#trim-path-from-string-static)
+  - [Get path between two segments](#get-path-between-two-segments)
+- [Utils](#memo-utils)
+  - [Split path from string](#split-path-from-string)
+  - [Trim path from string](#trim-path-from-string)
+  - [Parse filename](#parse-filename)
 - [API](#gear-api)
 - [Licence](#balance_scale-licence)
 - [Authors](#busts_in_silhouette-authors)
@@ -94,6 +96,20 @@ url.addOrReplaceParams({ userId: 10, commentId: 5 });
 // Param 'userId' is now : 10
 // Param 'commentId' is now : 5
 ```
+Retrieve params
+```ts
+const url = new UrlBuilder()
+    .addParams({
+      startDate: '1679737680454',
+      endDate: '1679937680454',
+    });
+
+const params = url.getParams();
+// params contain all path params as Map
+
+const filteredParams = url.findParams(([key, value]) => new Date(Number(value)).getDate() === 25);
+// filteredParams contain a new Map only with param 'startDate'
+```
 Get the first path segment
 ```ts
 const rowNum = 10;
@@ -142,6 +158,23 @@ url.addQueryParams({ page: 4, order: 'ASC' });
 url.addOrReplaceQueryParams({ page: 4, order: 'ASC' });
 // QueryParam 'page' is now : 4
 // QueryParam 'order' is now : ASC
+```
+Retrieve query params
+```ts
+const url = new UrlBuilder()
+    .addQueryParams({
+      style: 'dark',
+      utm_source: 'Google',
+      utm_medium: 'newsletter',
+      utm_campaign: 'summer',
+      isMobile: 1
+    });
+
+const queryParams = url.getQueryParams();
+// queryParams contain all query params as Map
+
+const filteredQueryParams = url.findQueryParams(([key]) => key.startsWith('utm'));
+// filteredQueryParams contain a new Map only with query params 'utm_source', 'utm_medium' and 'utm_campaign'
 ```
 
 ### Handle file
@@ -228,7 +261,7 @@ url.getParent(3); // Get 'http://localhost:8080/orders'
 ```
 
 ### Get relative path
-Retrieve the relative path in string format
+Retrieve the relative path as string format
 ```ts
 const postId = 'a937b39e-9664-404a-ac56-f3da2b83a951';
 const url = UrlBuilder.createFromUrl('http://localhost:8080/posts/:id').addParam('id', postId);
@@ -242,8 +275,8 @@ url.getRelativePath(); // Output: '/posts/a937b39e-9664-404a-ac56-f3da2b83a951'
 url.getRelativePath(true); // Output: '/posts/a937b39e-9664-404a-ac56-f3da2b83a951?displaySimilar=true'
 ```
 
-### Get query params in string
-Retrieve the query params in string format
+### Get query params as string
+Retrieve the query params as string format
 ```ts
 const url = UrlBuilder.createFromUrl('http://localhost:8080/vehicles').addQueryParams({
   page: 2,
@@ -253,7 +286,7 @@ url.getQueryString(); // Output: '?page=2&order=ASC'
 ```
 
 ### Convert full URL to string
-Retrieve the query params in string format
+Retrieve the query params as string format
 ```ts
 const name = 'url-builder';
 const url = UrlBuilder.createFromUrl('https://github.com/InnovA2')
@@ -289,8 +322,7 @@ const url4: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
 url4.compareToPathBySegment('/users/10/comments', true) // Output: true
 ```
 
-### Get segments between two others
-Get the segments path between two segments
+### Get path between two segments
 ```ts
 const url = UrlBuilder.createFromUrl('http://localhost:8080/users/10/comments');
 url.getBetween2Segments('users', 'comments'); // Output: 10
@@ -299,27 +331,45 @@ const url2 = UrlBuilder.createFromUrl('http://localhost:8080/users/10/comments/5
 url2.getBetween2Segments('users', '5'); // Output: 10/comments
 ```
 
-### Split path from string (static)
+## :memo: Utils
+### Split path from string
 Split path string by slash
 ```ts
-UrlBuilder.splitPath('/InnovA2/url-builder/pulls/'); // Output: ['InnovA2', 'url-builder', 'pulls']
+UrlUtils.splitPath('/InnovA2/url-builder/pulls/'); // Output: ['InnovA2', 'url-builder', 'pulls']
 // or if you have more slashes
-UrlBuilder.splitPath('/InnovA2///url-builder/pulls/'); // Output: ['InnovA2', 'url-builder', 'pulls']
+UrlUtils.splitPath('/InnovA2///url-builder/pulls/'); // Output: ['InnovA2', 'url-builder', 'pulls']
 ```
 
-### Trim path from string (static)
+### Trim path from string
 Trim path string by removing useless slashes
+
 ```ts
-UrlBuilder.trimPath('/InnovA2/url-builder/pulls/'); // Output: 'InnovA2/url-builder/pulls'
+UrlUtils.trimPath('/InnovA2/url-builder/pulls/'); // Output: 'InnovA2/url-builder/pulls'
 // or if you have more slashes
-UrlBuilder.trimPath('/InnovA2///url-builder/pulls/'); // Output: 'InnovA2/url-builder/pulls'
+UrlUtils.trimPath('/InnovA2///url-builder/pulls/'); // Output: 'InnovA2/url-builder/pulls'
+```
+
+### Parse filename
+Parse filename to create file object containing 'name' and 'ext' (extension).
+Works with any extension (no verification).
+```ts
+UrlUtils.parseFile('image.png'); // Output: { name: 'image', ext: 'png' }
 ```
     
 ## :gear: API
+### Types / Interfaces
+```ts
+type ParamType = string | number | boolean;
+type ParamFindPredicate = (value: [string, ParamType], index: number, obj: [string, ParamType][]) => boolean;
+interface FileInterface {
+  name: string;
+  ext: string;
+}
+```
+
+### UrlBuilder
 ```ts
 static createFromUrl(baseUrl: string): UrlBuilder
-static splitPath(path: string): string[]
-static trimPath(path: string): string
 compareTo(url: UrlBuilder, relative = true): boolean
 compareToPathBySegment(path: string, validateUnfilledParams = false): boolean
 getScheme(): Scheme
@@ -329,33 +379,44 @@ setHost(host: string): UrlBuilder
 getPort(): numbe
 setPort(port: number): UrlBuilder
 getPathSegments(): string[]
-setPathSegments(segments: string[], params: Record<string, string | number>): UrlBuilder
-addPath(path: string, params: Record<string, string | number>): UrlBuilder
-getParams(): Map<string, string | number>
-setParams(params: Map<string, string | number>): UrlBuilder
-addParam(key: string, value: string | number): UrlBuilder
-addParams(params: Record<string, string | number>): UrlBuilder
-getParams(): Map<string, string | number>
-getQueryParams(): Map<string, string | number>
-setQueryParams(query: Map<string, string | number>): UrlBuilder
-addQueryParam(key: string, value: string | number): UrlBuilder
-addQueryParams(queries: Record<string, string | number>): UrlBuilder
-getQueryParams(): Map<string, string | number>
+setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder
+addPath(path: string, params?: Record<string, ParamType>): UrlBuilder
+getParams(): Map<string, ParamType>
+findParams(predicate: ParamFindPredicate): Map<string, ParamType>
+setParams(params: Map<string, ParamType>): UrlBuilder
+addParam(key: string, value: ParamType): UrlBuilder
+addOrReplaceParam(key: string, value: ParamType): UrlBuilder
+addParams(params: Record<string, ParamType>): UrlBuilder
+addOrReplaceParams(params: Record<string, ParamType>): UrlBuilder
+getQueryParams(): Map<string, ParamType>
+findQueryParams(predicate: ParamFindPredicate): Map<string, ParamType>
+setQueryParams(query: Map<string, ParamType>): UrlBuilder
+addQueryParam(key: string, value: ParamType): UrlBuilder
+addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder
+addQueryParams(queries: Record<string, ParamType>): UrlBuilder
+addOrReplaceQueryParams(queries: Record<string, ParamType>): UrlBuilder
 setFilename(filename: string): UrlBuilder
 setFile(file: FileInterface): UrlBuilder
 getFile(): FileInterface
 getFragment(): string
 setFragment(fragment: string): UrlBuilder
 mergePathWith(url: UrlBuilder): UrlBuilder
-getFirstPath(): string
-getLastPath(): string
+getFirstPathSegment(): string
+getLastPathSegment(): string
 getParent(n = 1): UrlBuilder
 getBetween2Segments(a: string, b: string): string
-getRelativePath(query = false): string
+getRelativePath(query = false, withFragment = false): string
 getQueryString(): string
 toString(): string
 ```
 > **Note** : Only the non-static getParent() method return new instance of UrlBuilder. Others update and return the current instance.
+
+### UrlUtils (namespace)
+```ts
+splitPath(path: string): string[]
+trimPath(path: string): string
+parseFile = (filename: string): FileInterface
+```
 
 ## :balance_scale: Licence
 [MIT](LICENSE)

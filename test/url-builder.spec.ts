@@ -205,7 +205,7 @@ describe('UrlBuilder', () => {
                 style: 'dark',
                 utm_source: 'Google',
                 utm_medium: 'newsletter',
-                utm_campain: 'summer',
+                utm_campaign: 'summer',
                 isMobile: 1
             });
 
@@ -213,7 +213,7 @@ describe('UrlBuilder', () => {
         expect(filteredMap.has('style')).toBeFalsy();
         expect(filteredMap.has('utm_source')).toBeTruthy();
         expect(filteredMap.has('utm_medium')).toBeTruthy();
-        expect(filteredMap.has('utm_campain')).toBeTruthy();
+        expect(filteredMap.has('utm_campaign')).toBeTruthy();
         expect(filteredMap.has('isMobile')).toBeFalsy();
     });
 
