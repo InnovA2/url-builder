@@ -137,6 +137,18 @@ describe('UrlBuilder', () => {
         expect(url.getParams().get('userId')).toEqual(10);
     });
 
+    test('should find params', () => {
+        const url: UrlBuilder = new UrlBuilder()
+            .addParams({
+                startDate: '1679737680454',
+                endDate: '1679937680454',
+            });
+
+        const filteredMap = url.findParams(([key, value]) => new Date(Number(value)).getDate() === 25);
+        expect(filteredMap.has('startDate')).toBeTruthy();
+        expect(filteredMap.has('endDate')).toBeFalsy();
+    });
+
     test('should set the same params', () => {
         const map = new Map<string, string | number>()
             .set('userId', 10).set('commentId', 1);
@@ -148,7 +160,7 @@ describe('UrlBuilder', () => {
         expect(url.getParams()).toEqual(map);
     });
 
-    test('should add queries', () => {
+    test('should add query params', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
             .addQueryParams({
@@ -171,7 +183,7 @@ describe('UrlBuilder', () => {
         expect(url.getRelativePath(true)).toBe('/users?page=3&order=DESC');
     });
 
-    test('should get the same queries', () => {
+    test('should get the same query params', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
             .addQueryParams({
@@ -182,7 +194,25 @@ describe('UrlBuilder', () => {
         expect(url.getQueryParams().get('order')).toBe('ASC');
     });
 
-    test('should set the same queries', () => {
+    test('should find query params', () => {
+        const url: UrlBuilder = new UrlBuilder()
+            .addQueryParams({
+                style: 'dark',
+                utm_source: 'Google',
+                utm_medium: 'newsletter',
+                utm_campain: 'summer',
+                isMobile: 1
+            });
+
+        const filteredMap = url.findQueryParams(([key]) => key.startsWith('utm'));
+        expect(filteredMap.has('style')).toBeFalsy();
+        expect(filteredMap.has('utm_source')).toBeTruthy();
+        expect(filteredMap.has('utm_medium')).toBeTruthy();
+        expect(filteredMap.has('utm_campain')).toBeTruthy();
+        expect(filteredMap.has('isMobile')).toBeFalsy();
+    });
+
+    test('should set the same query params', () => {
         const map = new Map<string, string | number>()
             .set('page', 1).set('order', 'ASC');
 

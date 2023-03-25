@@ -2,14 +2,15 @@ import * as urlParser from 'url-parse';
 import { Scheme } from './enums/scheme.enum';
 import { UrlConstants } from './url.constants';
 import { FileInterface } from './file.interface';
+import { ParamFindPredicate, ParamType } from './types';
 
 export class UrlBuilder {
     private scheme = Scheme.HTTPS;
     private host: string;
     private port: number;
     private pathSegments: string[] = [];
-    private params = new Map<string, string | number | boolean>();
-    private query = new Map<string, string | number | boolean>();
+    private params = new Map<string, ParamType>();
+    private query = new Map<string, ParamType>();
     private fragment: string;
     private file: FileInterface;
 
@@ -132,80 +133,88 @@ export class UrlBuilder {
         return this.pathSegments;
     }
 
-    setPathSegments(segments: string[], params?: Record<string, string | number | boolean>): UrlBuilder {
+    setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder {
         this.pathSegments = segments;
         return params ? this.addParams(params) : this;
     }
 
-    addPath(path: string, params?: Record<string, string | number | boolean>): UrlBuilder {
+    addPath(path: string, params?: Record<string, ParamType>): UrlBuilder {
         this.pathSegments.push(...UrlBuilder.splitPath(path));
         return params ? this.addParams(params) : this;
     }
 
-    getParams(): Map<string, string | number | boolean> {
+    getParams(): Map<string, ParamType> {
         return this.params;
     }
 
-    setParams(params: Map<string, string | number | boolean>): UrlBuilder {
+    findParams(predicate: ParamFindPredicate): Map<string, ParamType> {
+        return new Map([...this.params].filter(predicate));
+    }
+
+    setParams(params: Map<string, ParamType>): UrlBuilder {
         this.params = params;
         return this;
     }
 
-    addParam(key: string, value: string | number | boolean): UrlBuilder {
+    addParam(key: string, value: ParamType): UrlBuilder {
         if (!this.params.has(key)) {
             this.params.set(key, value);
         }
         return this;
     }
 
-    addOrReplaceParam(key: string, value: string | number | boolean): UrlBuilder {
+    addOrReplaceParam(key: string, value: ParamType): UrlBuilder {
         this.params.set(key, value);
         return this;
     }
 
-    addParams(params: Record<string, string | number | boolean>): UrlBuilder {
+    addParams(params: Record<string, ParamType>): UrlBuilder {
         for (const [key, value] of Object.entries(params)) {
             this.addParam(key, value);
         }
         return this;
     }
 
-    addOrReplaceParams(params: Record<string, string | number | boolean>): UrlBuilder {
+    addOrReplaceParams(params: Record<string, ParamType>): UrlBuilder {
         for (const [key, value] of Object.entries(params)) {
             this.params.set(key, value);
         }
         return this;
     }
 
-    getQueryParams(): Map<string, string | number | boolean> {
+    getQueryParams(): Map<string, ParamType> {
         return this.query;
     }
 
-    setQueryParams(query: Map<string, string | number | boolean>): UrlBuilder {
+    findQueryParams(predicate: ParamFindPredicate): Map<string, ParamType> {
+        return new Map([...this.query].filter(predicate));
+    }
+
+    setQueryParams(query: Map<string, ParamType>): UrlBuilder {
         this.query = query;
         return this;
     }
 
-    addQueryParam(key: string, value: string | number | boolean): UrlBuilder {
+    addQueryParam(key: string, value: ParamType): UrlBuilder {
         if (!this.query.has(key)) {
             this.query.set(key, value);
         }
         return this;
     }
 
-    addOrReplaceQueryParam(key: string, value: string | number | boolean): UrlBuilder {
+    addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder {
         this.query.set(key, value);
         return this;
     }
 
-    addQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder {
+    addQueryParams(queries: Record<string, ParamType>): UrlBuilder {
         for (const [key, value] of Object.entries(queries)) {
             this.addQueryParam(key, value);
         }
         return this;
     }
 
-    addOrReplaceQueryParams(queries: Record<string, string | number | boolean>): UrlBuilder {
+    addOrReplaceQueryParams(queries: Record<string, ParamType>): UrlBuilder {
         for (const [key, value] of Object.entries(queries)) {
             this.query.set(key, value);
         }
@@ -272,7 +281,7 @@ export class UrlBuilder {
 
         parent.pathSegments.filter(path => path !== lastPath);
         parent.params.delete(lastPath.replace(UrlConstants.URL_PATH_PREFIX, ''));
-        parent.query = new Map<string, string | number>();
+        parent.query = new Map<string, ParamType>();
 
         return n > 1 ? parent.getParent(n - 1) : parent;
     }
