@@ -339,10 +339,10 @@ export class UrlBuilder {
 
         const relativePath = paths.length ? (UrlConstants.URL_PATH_SEPARATOR + paths.join(UrlConstants.URL_PATH_SEPARATOR)) : '';
         const queryString = this.getQueryString();
-        const filename = this.file ? [this.file.name, this.file.ext].join(UrlConstants.URL_EXT_SEPARATOR) : '';
+        const filename = this.file ? UrlConstants.URL_PATH_SEPARATOR + [this.file.name, this.file.ext].join(UrlConstants.URL_EXT_SEPARATOR) : '';
 
-        const url = withQuery && queryString ? (relativePath + filename + queryString) : (relativePath + filename);
-        return withFragment ? `${url}#${this.fragment}` : url;
+        const url = relativePath + filename + (withQuery && queryString ? queryString : '');
+        return withFragment && this.fragment ? `${url}#${this.fragment}` : url;
     }
 
     /**
@@ -368,7 +368,7 @@ export class UrlBuilder {
             baseUrl = [baseUrl, this.port].join(':');
         }
 
-        return [baseUrl, this.getRelativePath(), this.getQueryString()]
+        return [baseUrl, this.getRelativePath(true, true)]
             .filter(item => item)
             .join('');
     }
