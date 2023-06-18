@@ -59,6 +59,13 @@ class UrlBuilder {
     static trimPath(path) {
         return url_utils_1.UrlUtils.trimPath(path);
     }
+    copy() {
+        const url = new UrlBuilder();
+        for (const [key, value] of Object.entries(this)) {
+            url[key] = this.propertyMapping(value);
+        }
+        return url;
+    }
     /**
      * Compare the current UrlBuilder to another
      * @param url UrlBuilder to compare
@@ -279,9 +286,9 @@ class UrlBuilder {
         }
         const relativePath = paths.length ? (url_constants_1.UrlConstants.URL_PATH_SEPARATOR + paths.join(url_constants_1.UrlConstants.URL_PATH_SEPARATOR)) : '';
         const queryString = this.getQueryString();
-        const filename = this.file ? [this.file.name, this.file.ext].join(url_constants_1.UrlConstants.URL_EXT_SEPARATOR) : '';
-        const url = withQuery && queryString ? (relativePath + filename + queryString) : (relativePath + filename);
-        return withFragment ? `${url}#${this.fragment}` : url;
+        const filename = this.file ? url_constants_1.UrlConstants.URL_PATH_SEPARATOR + [this.file.name, this.file.ext].join(url_constants_1.UrlConstants.URL_EXT_SEPARATOR) : '';
+        const url = relativePath + filename + (withQuery && queryString ? queryString : '');
+        return withFragment && this.fragment ? `${url}#${this.fragment}` : url;
     }
     /**
      * Get queryParams params as string
@@ -301,9 +308,21 @@ class UrlBuilder {
         if (this.port) {
             baseUrl = [baseUrl, this.port].join(':');
         }
-        return [baseUrl, this.getRelativePath(), this.getQueryString()]
+        return [baseUrl, this.getRelativePath(true, true)]
             .filter(item => item)
             .join('');
+    }
+    propertyMapping(value) {
+        switch (true) {
+            case Array.isArray(value):
+                return [...value];
+            case value instanceof Map:
+                return new Map(value);
+            case typeof value === 'object':
+                return Object.assign({}, value);
+            default:
+                return value;
+        }
     }
 }
 exports.UrlBuilder = UrlBuilder;

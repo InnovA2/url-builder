@@ -28,6 +28,7 @@ export declare class UrlBuilder {
      * @param path relative path to trim
      */
     static trimPath(path: string): string;
+    copy(): UrlBuilder;
     /**
      * Compare the current UrlBuilder to another
      * @param url UrlBuilder to compare
@@ -116,4 +117,5 @@ export declare class UrlBuilder {
      * Convert full UrlBuilder to string url
      */
     toString(): string;
+    private propertyMapping;
 }
