@@ -29,6 +29,10 @@ export default {
   // coveragePathIgnorePatterns: [
   //   "\\\\node_modules\\\\"
   // ],
+  coveragePathIgnorePatterns : [
+    "<rootDir>/node_modules",
+    "<rootDir>/src/index.ts"
+  ],
 
   // Indicates which provider should be used to instrument code for coverage
   coverageProvider: "v8",

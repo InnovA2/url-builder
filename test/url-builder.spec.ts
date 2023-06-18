@@ -40,6 +40,16 @@ describe('UrlBuilder', () => {
         expect(UrlBuilder.trimPath(url.getRelativePath())).toBe(path_user_comments.slice(1));
     });
 
+    test('should copy url', () => {
+        const usersUrl = UrlBuilder.createFromUrl(base_url).addPath('users/:id', { id: 2 });
+        const ticketsUrl = usersUrl.copy().addPath('tickets').setFilename('index.html');
+        const ticketsUrlWithFragment = ticketsUrl.copy().setFragment('intro');
+
+        expect(usersUrl.toString()).toBe(base_url + '/users/2');
+        expect(ticketsUrl.toString()).toBe(base_url + '/users/2/tickets/index.html');
+        expect(ticketsUrlWithFragment.toString()).toBe(base_url + '/users/2/tickets/index.html#intro');
+    });
+
     test('should compare urls', () => {
         const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
         const url2: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);

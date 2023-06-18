@@ -73,6 +73,14 @@ export class UrlBuilder {
         return UrlUtils.trimPath(path);
     }
 
+    copy(): UrlBuilder {
+        const url = new UrlBuilder();
+        for (const [key, value] of Object.entries(this)) {
+            url[key] = this.propertyMapping(value);
+        }
+        return url;
+    }
+
     /**
      * Compare the current UrlBuilder to another
      * @param url UrlBuilder to compare
@@ -371,5 +379,21 @@ export class UrlBuilder {
         return [baseUrl, this.getRelativePath(true, true)]
             .filter(item => item)
             .join('');
+    }
+
+    private propertyMapping(value: any): any {
+        switch (true) {
+            case Array.isArray(value):
+                return [...value];
+
+            case value instanceof Map:
+                return new Map(value);
+
+            case typeof value === 'object':
+                return { ...value };
+
+            default:
+                return value;
+        }
     }
 }
