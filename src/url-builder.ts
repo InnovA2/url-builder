@@ -1,19 +1,20 @@
 import * as urlParser from 'url-parse';
 import { Scheme } from './enums/scheme.enum';
 import { UrlConstants } from './url.constants';
-import { FileInterface } from './file.interface';
-import { ParamFindPredicate, ParamType } from './types';
+import { ParamType, IFile } from './types';
 import { UrlUtils } from './url.utils';
+import { QueryParams } from './maps/query-params';
+import { PathParams } from './maps/path-params';
 
 export class UrlBuilder {
     private scheme = Scheme.HTTPS;
     private host: string;
     private port: number;
     private pathSegments: string[] = [];
-    private params = new Map<string, ParamType>();
-    private queryParams = new Map<string, ParamType>();
+    private pathParams = new PathParams(this);
+    private queryParams = new QueryParams(this);
     private fragment: string;
-    private file: FileInterface;
+    private file: IFile;
 
     /**
      * Create UrlBuilder instance from string url
@@ -93,7 +94,7 @@ export class UrlBuilder {
     /**
      * Compare the current path to another one, taking into account or not parameters
      * @param path relative path to compare to (e.g. /users/10/groups or /users/:id/groups)
-     * @param validateUnfilledParams true to validate params unfilled from currentUrl (e.g. /users/:id/groups)
+     * @param validateUnfilledParams true to validate pathParams unfilled from currentUrl (e.g. /users/:id/groups)
      */
     compareToPathBySegment(path: string, validateUnfilledParams = false): boolean {
         const pathSegments = UrlUtils.splitPath(path);
@@ -102,7 +103,7 @@ export class UrlBuilder {
                 return false;
             }
             if (segment.startsWith(UrlConstants.URL_PATH_PREFIX)) {
-                const param = this.params.get(segment.replace(UrlConstants.URL_PATH_PREFIX, ''));
+                const param = this.pathParams.get(segment.replace(UrlConstants.URL_PATH_PREFIX, ''));
                 return validateUnfilledParams || (param === pathSegments[i]);
             }
             return pathSegments[i].toLowerCase() === segment.toLowerCase();
@@ -144,89 +145,29 @@ export class UrlBuilder {
 
     setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder {
         this.pathSegments = segments;
-        return params ? this.addParams(params) : this;
+        return params ? this.pathParams.addAll(params).getBaseUrl() : this;
     }
 
     addPath(path: string, params?: Record<string, ParamType>): UrlBuilder {
         this.pathSegments.push(...UrlUtils.splitPath(path));
-        return params ? this.addParams(params) : this;
+        return params ? this.pathParams.addAll(params).getBaseUrl() : this;
     }
 
-    getParams(): Map<string, ParamType> {
-        return this.params;
+    getPathParams(): PathParams {
+        return this.pathParams;
     }
 
-    findParams(predicate: ParamFindPredicate): Map<string, ParamType> {
-        return new Map([...this.params].filter(predicate));
-    }
-
-    setParams(params: Map<string, ParamType>): UrlBuilder {
-        this.params = params;
+    setPathParams(params: PathParams): this {
+        this.pathParams = params;
         return this;
     }
 
-    addParam(key: string, value: ParamType): UrlBuilder {
-        if (!this.params.has(key)) {
-            this.params.set(key, value);
-        }
-        return this;
-    }
-
-    addOrReplaceParam(key: string, value: ParamType): UrlBuilder {
-        this.params.set(key, value);
-        return this;
-    }
-
-    addParams(params: Record<string, ParamType>): UrlBuilder {
-        for (const [key, value] of Object.entries(params)) {
-            this.addParam(key, value);
-        }
-        return this;
-    }
-
-    addOrReplaceParams(params: Record<string, ParamType>): UrlBuilder {
-        for (const [key, value] of Object.entries(params)) {
-            this.params.set(key, value);
-        }
-        return this;
-    }
-
-    getQueryParams(): Map<string, ParamType> {
+    getQueryParams(): QueryParams {
         return this.queryParams;
     }
 
-    findQueryParams(predicate: ParamFindPredicate): Map<string, ParamType> {
-        return new Map([...this.queryParams].filter(predicate));
-    }
-
-    setQueryParams(query: Map<string, ParamType>): UrlBuilder {
+    setQueryParams(query: QueryParams): UrlBuilder {
         this.queryParams = query;
-        return this;
-    }
-
-    addQueryParam(key: string, value: ParamType): UrlBuilder {
-        if (!this.queryParams.has(key)) {
-            this.queryParams.set(key, value);
-        }
-        return this;
-    }
-
-    addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder {
-        this.queryParams.set(key, value);
-        return this;
-    }
-
-    addQueryParams(queries: Record<string, ParamType>): UrlBuilder {
-        for (const [key, value] of Object.entries(queries)) {
-            this.addQueryParam(key, value);
-        }
-        return this;
-    }
-
-    addOrReplaceQueryParams(queries: Record<string, ParamType>): UrlBuilder {
-        for (const [key, value] of Object.entries(queries)) {
-            this.queryParams.set(key, value);
-        }
         return this;
     }
 
@@ -235,12 +176,12 @@ export class UrlBuilder {
         return this;
     }
 
-    setFile(file: FileInterface): UrlBuilder {
+    setFile(file: IFile): UrlBuilder {
         this.file = file;
         return this;
     }
 
-    getFile(): FileInterface {
+    getFile(): IFile {
         return this.file;
     }
 
@@ -254,13 +195,13 @@ export class UrlBuilder {
     }
 
     /**
-     * Merge path segments, params and queryParams with passed UrlBuilder
+     * Merge path segments, pathParams and queryParams with passed UrlBuilder
      * @param url to merge path
      */
     mergePathWith(url: UrlBuilder): UrlBuilder {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
-        this.setParams(new Map([...this.params.entries(), ...url.params.entries()]));
-        this.setQueryParams(new Map([...this.queryParams.entries(), ...url.queryParams.entries()]));
+        this.setPathParams(new PathParams(this, [...this.pathParams.entries(), ...url.pathParams.entries()]));
+        this.setQueryParams(new QueryParams(this, [...this.queryParams.entries(), ...url.queryParams.entries()]));
         this.setFile(url.getFile());
 
         return this;
@@ -301,12 +242,11 @@ export class UrlBuilder {
      * @param n offset/level
      */
     getParent(n = 1): UrlBuilder {
-        const parent = UrlBuilder.createFromUrl(this.toString());
+        const parent = this.copy();
         const lastPath = parent.pathSegments.pop();
 
-        parent.pathSegments.filter(path => path !== lastPath);
-        parent.params.delete(lastPath.replace(UrlConstants.URL_PATH_PREFIX, ''));
-        parent.queryParams = new Map<string, ParamType>();
+        parent.pathParams.delete(lastPath.replace(UrlConstants.URL_PATH_PREFIX, ''));
+        parent.queryParams = new QueryParams(parent);
 
         return n > 1 ? parent.getParent(n - 1) : parent;
     }
@@ -328,14 +268,14 @@ export class UrlBuilder {
 
     /**
      * Get relative path
-     * @param withQuery true to get queryParams params
+     * @param withQuery true to get queryParams pathParams
      * @param withFragment true to get fragment
      */
     getRelativePath(withQuery = false, withFragment = false): string {
         const paths: string[] = [];
 
         for (let path of this.pathSegments) {
-            const param = Array.from(this.params.entries())
+            const param = Array.from(this.pathParams.entries())
                 .find(([k, v]) => `${UrlConstants.URL_PATH_PREFIX}${k}` === path);
 
             if (param) {
@@ -346,24 +286,10 @@ export class UrlBuilder {
         }
 
         const relativePath = paths.length ? (UrlConstants.URL_PATH_SEPARATOR + paths.join(UrlConstants.URL_PATH_SEPARATOR)) : '';
-        const queryString = this.getQueryString();
         const filename = this.file ? UrlConstants.URL_PATH_SEPARATOR + [this.file.name, this.file.ext].join(UrlConstants.URL_EXT_SEPARATOR) : '';
 
-        const url = relativePath + filename + (withQuery && queryString ? queryString : '');
+        const url = relativePath + filename + (withQuery ? this.queryParams.toString() : '');
         return withFragment && this.fragment ? `${url}#${this.fragment}` : url;
-    }
-
-    /**
-     * Get queryParams params as string
-     */
-    getQueryString(): string {
-        const queryParams: string[] = [];
-
-        this.queryParams.forEach((value, key) => {
-            queryParams.push([key, value].join('='));
-        });
-
-        return queryParams.length ? ('?' + queryParams.join('&')) : null;
     }
 
     /**
@@ -386,8 +312,11 @@ export class UrlBuilder {
             case Array.isArray(value):
                 return [...value];
 
-            case value instanceof Map:
-                return new Map(value);
+            case value instanceof PathParams:
+                return new PathParams(this, value);
+
+            case value instanceof QueryParams:
+                return new QueryParams(this, value);
 
             case typeof value === 'object':
                 return { ...value };

@@ -1,5 +1,5 @@
 import { UrlConstants } from './url.constants';
-import { FileInterface } from './file.interface';
+import { IFile } from './types';
 
 export namespace UrlUtils {
     /**
@@ -24,7 +24,7 @@ export namespace UrlUtils {
      * Parse filename to create file object containing name and ext (extension)
      * @param filename filename to parse
      */
-    export const parseFile = (filename: string): FileInterface => {
+    export const parseFile = (filename: string): IFile => {
         const matchType = filename.match(UrlConstants.REGEX_FILENAME);
         if (matchType && matchType.length > 2) {
             return {

@@ -1,5 +1,8 @@
 import { UrlBuilder } from "../src";
 import { Scheme } from "../src/enums/scheme.enum";
+import { QueryParams } from '../src/maps/query-params';
+import { PathParams } from '../src/maps/path-params';
+import * as path from 'path';
 
 describe('UrlBuilder', () => {
     const base_url = 'https://localhost';
@@ -24,7 +27,8 @@ describe('UrlBuilder', () => {
     test('should parse existing url', () => {
         const url: UrlBuilder = UrlBuilder
             .createFromUrl(url_users_paginated_with_port)
-            .addQueryParam('order', 'DESC');
+            .getQueryParams().add('order', 'DESC')
+            .getBaseUrl();
 
         expect(url.toString()).toBe(url_users_paginated_with_port + '&order=DESC');
     });
@@ -114,11 +118,13 @@ describe('UrlBuilder', () => {
 
     test('should add params', () => {
         const url: UrlBuilder = new UrlBuilder()
-            .addPath('users/:userId/comments/:commentId')
-            .addParams({
-                userId: 10,
-                commentId: 1
-            });
+            .addPath('users/:userId/comments/:commentId');
+
+        const pathParams = url.getPathParams().setAll({
+            userId: 10,
+            commentId: 1
+        });
+
         const url2: UrlBuilder = new UrlBuilder()
             .addPath('users/:userId/comments/:commentId', {
                 userId: 10,
@@ -128,98 +134,113 @@ describe('UrlBuilder', () => {
         expect(url.getRelativePath()).toBe(path_user_comment);
         expect(url2.getRelativePath()).toBe(path_user_comment);
 
-        url.addParam('userId', 15); // Should be ignored
+        pathParams.add('userId', 15); // Should be ignored
         expect(url.getRelativePath()).toBe(path_user_comment);
 
-        url.addOrReplaceParam('userId', 15); // Should be replaced
+        pathParams.set('userId', 15); // Should be replaced
         expect(url.getRelativePath()).toBe('/users/15/comments/1');
 
-        url.addParams({ commentId: 2 }); // Should be ignored
+        pathParams.addAll({ commentId: 2 }); // Should be ignored
         expect(url.getRelativePath()).toBe('/users/15/comments/1');
 
-        url.addOrReplaceParams({ commentId: 2 }); // Should be replaced
+        pathParams.setAll({ commentId: 2 }); // Should be replaced
         expect(url.getRelativePath()).toBe('/users/15/comments/2');
     });
 
     test('should get the same params', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users/:userId/comments/:commentId')
-            .addParams({
+            .getPathParams().addAll({
                 userId: 10,
                 commentId: 1
-            });
+            })
+            .getBaseUrl();
 
-        expect(url.getParams().get('userId')).toEqual(10);
+        expect(url.getPathParams().get('userId')).toEqual(10);
     });
 
-    test('should find params', () => {
-        const url: UrlBuilder = new UrlBuilder()
-            .addParams({
+    test('should filter params', () => {
+        const pathParams = new UrlBuilder()
+            .getPathParams().addAll({
                 startDate: '1679737680454',
                 endDate: '1679937680454',
             });
 
-        const filteredMap = url.findParams(([key, value]) => new Date(Number(value)).getDate() === 25);
+        const filteredMap = pathParams.filter(([_, value]) =>
+            new Date(Number(value)).getDate() === 25
+        );
         expect(filteredMap.has('startDate')).toBeTruthy();
         expect(filteredMap.has('endDate')).toBeFalsy();
     });
 
+    test('should delete some params', () => {
+        const pathParams = new UrlBuilder()
+            .getPathParams().addAll({ a: 1, b: 2, c: 3, d: 4, e: 5 });
+
+        pathParams.deleteBy(([_, value]) =>
+            (value as number) % 2 === 0
+        );
+        const objectParams = pathParams.getAll();
+        expect(objectParams).toEqual({ a: 1, c: 3, e: 5 });
+    });
+
     test('should set the same params', () => {
-        const map = new Map<string, string | number>()
+        const map = new PathParams()
             .set('userId', 10).set('commentId', 1);
 
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users/:userId/comments/:commentId')
-            .setParams(map);
+            .setPathParams(map);
 
-        expect(url.getParams()).toEqual(map);
+        expect(url.getPathParams()).toEqual(map);
     });
 
     test('should add query params', () => {
         const url: UrlBuilder = new UrlBuilder()
-            .addPath('users')
-            .addQueryParams({
+            .addPath('users');
+        const queryParams = url.getQueryParams().setAll({
                 page: 1,
                 order: 'ASC'
             });
 
         expect(url.getRelativePath(true)).toBe(path_users_with_qp);
 
-        url.addQueryParam('page', 2); // Should be ignored
+        queryParams.add('page', 2); // Should be ignored
         expect(url.getRelativePath(true)).toBe(path_users_with_qp);
 
-        url.addOrReplaceQueryParam('page', 2); // Should be replaced
+        queryParams.set('page', 2); // Should be replaced
         expect(url.getRelativePath(true)).toBe('/users?page=2&order=ASC');
 
-        url.addQueryParams({ page: 3, order: 'DESC' }); // Should be ignored
+        queryParams.addAll({ page: 3, order: 'DESC' }); // Should be ignored
         expect(url.getRelativePath(true)).toBe('/users?page=2&order=ASC');
 
-        url.addOrReplaceQueryParams({ page: 3, order: 'DESC' }); // Should be replaced
+        queryParams.setAll({ page: 3, order: 'DESC' }); // Should be replaced
         expect(url.getRelativePath(true)).toBe('/users?page=3&order=DESC');
     });
 
     test('should get the same query params', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
-            .addQueryParams({
+            .getQueryParams().setAll({
                 page: 1,
                 order: 'ASC'
-            });
+            })
+            .getBaseUrl();
 
         expect(url.getQueryParams().get('order')).toBe('ASC');
     });
 
     test('should find query params', () => {
-        const url: UrlBuilder = new UrlBuilder()
-            .addQueryParams({
+        const url = new UrlBuilder()
+            .getQueryParams().setAll({
                 style: 'dark',
                 utm_source: 'Google',
                 utm_medium: 'newsletter',
                 utm_campaign: 'summer',
                 isMobile: 1
-            });
+            }).getBaseUrl();
 
-        const filteredMap = url.findQueryParams(([key]) => key.startsWith('utm'));
+        const filteredMap = url.getQueryParams().filter(([key]) => key.startsWith('utm'));
         expect(filteredMap.has('style')).toBeFalsy();
         expect(filteredMap.has('utm_source')).toBeTruthy();
         expect(filteredMap.has('utm_medium')).toBeTruthy();
@@ -228,7 +249,7 @@ describe('UrlBuilder', () => {
     });
 
     test('should set the same query params', () => {
-        const map = new Map<string, string | number>()
+        const map = new QueryParams()
             .set('page', 1).set('order', 'ASC');
 
         const url: UrlBuilder = new UrlBuilder()
@@ -294,7 +315,8 @@ describe('UrlBuilder', () => {
 
         const anotherUrl: UrlBuilder = new UrlBuilder()
             .addPath(':id/users', { id: 2 })
-            .addQueryParam('page', 1)
+            .getQueryParams().add('page', 1)
+            .getBaseUrl();
 
         expect(url.mergePathWith(anotherUrl).toString()).toEqual(url_group_users_paginated);
     });
@@ -333,15 +355,16 @@ describe('UrlBuilder', () => {
 
 
     test('should get only query in relative path', () => {
-        const url: UrlBuilder = new UrlBuilder().addQueryParam('page', 2);
+        const url: UrlBuilder = new UrlBuilder()
+            .getQueryParams().add('page', 2)
+            .getBaseUrl();
 
         expect(url.getRelativePath(true)).toBe('?page=2');
     });
 
     test('should get the same relative path', () => {
         const url: UrlBuilder = new UrlBuilder()
-            .addPath('users/:id/comments')
-            .addParam('id', 10);
+            .addPath('users/:id/comments', { id: 10 });
 
         expect(url.getRelativePath()).toBe(path_user_comments);
     });
