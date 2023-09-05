@@ -33,17 +33,6 @@ describe('UrlBuilder', () => {
         expect(url.toString()).toBe(url_users_paginated_with_port + '&order=DESC');
     });
 
-    test('should split path', () => {
-        const segments = UrlBuilder.splitPath(path_user_comments);
-        expect(segments).toEqual(['users', '10', 'comments']);
-    });
-
-    test('should trim path', () => {
-        const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
-
-        expect(UrlBuilder.trimPath(url.getRelativePath())).toBe(path_user_comments.slice(1));
-    });
-
     test('should copy url', () => {
         const usersUrl = UrlBuilder.createFromUrl(base_url).addPath('users/:id', { id: 2 });
         const ticketsUrl = usersUrl.copy().addPath('tickets').setFilename('index.html');

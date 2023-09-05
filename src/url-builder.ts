@@ -56,24 +56,6 @@ export class UrlBuilder {
         return url;
     }
 
-    /**
-     * Split path in segments by slash.
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.splitPath()** instead.
-     * @param path relative path to split
-     */
-    static splitPath(path: string): string[] {
-        return UrlUtils.splitPath(path);
-    }
-
-    /**
-     * Trim path (e.g. /users/:id/ -> user/:id).
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.trimPath()** instead.
-     * @param path relative path to trim
-     */
-    static trimPath(path: string): string {
-        return UrlUtils.trimPath(path);
-    }
-
     copy(): UrlBuilder {
         const url = new UrlBuilder();
         for (const [key, value] of Object.entries(this)) {
@@ -116,7 +98,7 @@ export class UrlBuilder {
         return this.scheme;
     }
 
-    setScheme(scheme: Scheme): UrlBuilder {
+    setScheme(scheme: Scheme): this {
         this.scheme = scheme;
         return this;
     }
@@ -125,7 +107,7 @@ export class UrlBuilder {
         return this.host;
     }
 
-    setHost(host: string): UrlBuilder {
+    setHost(host: string): this {
         this.host = host;
         return this;
     }
@@ -134,7 +116,7 @@ export class UrlBuilder {
         return this.port;
     }
 
-    setPort(port: number): UrlBuilder {
+    setPort(port: number): this {
         this.port = port;
         return this;
     }
@@ -166,17 +148,17 @@ export class UrlBuilder {
         return this.queryParams;
     }
 
-    setQueryParams(query: QueryParams): UrlBuilder {
+    setQueryParams(query: QueryParams): this {
         this.queryParams = query;
         return this;
     }
 
-    setFilename(filename: string): UrlBuilder {
+    setFilename(filename: string): this {
         this.file = UrlUtils.parseFile(filename);
         return this;
     }
 
-    setFile(file: IFile): UrlBuilder {
+    setFile(file: IFile): this {
         this.file = file;
         return this;
     }
@@ -189,7 +171,7 @@ export class UrlBuilder {
         return this.fragment;
     }
 
-    setFragment(fragment: string): UrlBuilder {
+    setFragment(fragment: string): this {
         this.fragment = fragment;
         return this;
     }
@@ -198,7 +180,7 @@ export class UrlBuilder {
      * Merge path segments, pathParams and queryParams with passed UrlBuilder
      * @param url to merge path
      */
-    mergePathWith(url: UrlBuilder): UrlBuilder {
+    mergePathWith(url: UrlBuilder): this {
         this.setPathSegments([...this.pathSegments, ...url.pathSegments]);
         this.setPathParams(new PathParams(this, [...this.pathParams.entries(), ...url.pathParams.entries()]));
         this.setQueryParams(new QueryParams(this, [...this.queryParams.entries(), ...url.queryParams.entries()]));
@@ -256,7 +238,7 @@ export class UrlBuilder {
      * @param a first segment to search
      * @param b last segment to search
      */
-    getBetween2Segments(a: string, b: string): string {
+    getBetween2Segments(a: string, b: string): string | null {
         const indexA = this.pathSegments.findIndex(path => path === a);
         const indexB = this.pathSegments.findIndex(path => path === b);
 
