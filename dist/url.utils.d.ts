@@ -1,4 +1,4 @@
-import { FileInterface } from './file.interface';
+import { IFile } from './types';
 export declare namespace UrlUtils {
     /**
      * Split path in segments by slash
@@ -14,5 +14,5 @@ export declare namespace UrlUtils {
      * Parse filename to create file object containing name and ext (extension)
      * @param filename filename to parse
      */
-    const parseFile: (filename: string) => FileInterface;
+    const parseFile: (filename: string) => IFile;
 }

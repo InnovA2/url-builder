@@ -1,12 +1,13 @@
 import { Scheme } from './enums/scheme.enum';
-import { FileInterface } from './file.interface';
-import { ParamFindPredicate, ParamType } from './types';
+import { ParamType, IFile } from './types';
+import { QueryParams } from './maps/query-params';
+import { PathParams } from './maps/path-params';
 export declare class UrlBuilder {
     private scheme;
     private host;
     private port;
     private pathSegments;
-    private params;
+    private pathParams;
     private queryParams;
     private fragment;
     private file;
@@ -16,18 +17,6 @@ export declare class UrlBuilder {
      * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
     static createFromUrl(baseUrl: string, isFile?: boolean): UrlBuilder;
-    /**
-     * Split path in segments by slash.
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.splitPath()** instead.
-     * @param path relative path to split
-     */
-    static splitPath(path: string): string[];
-    /**
-     * Trim path (e.g. /users/:id/ -> user/:id).
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **UrlUtils.trimPath()** instead.
-     * @param path relative path to trim
-     */
-    static trimPath(path: string): string;
     copy(): UrlBuilder;
     /**
      * Compare the current UrlBuilder to another
@@ -38,42 +27,32 @@ export declare class UrlBuilder {
     /**
      * Compare the current path to another one, taking into account or not parameters
      * @param path relative path to compare to (e.g. /users/10/groups or /users/:id/groups)
-     * @param validateUnfilledParams true to validate params unfilled from currentUrl (e.g. /users/:id/groups)
+     * @param validateUnfilledParams true to validate pathParams unfilled from currentUrl (e.g. /users/:id/groups)
      */
     compareToPathBySegment(path: string, validateUnfilledParams?: boolean): boolean;
     getScheme(): Scheme;
-    setScheme(scheme: Scheme): UrlBuilder;
+    setScheme(scheme: Scheme): this;
     getHost(): string;
-    setHost(host: string): UrlBuilder;
+    setHost(host: string): this;
     getPort(): number;
-    setPort(port: number): UrlBuilder;
+    setPort(port: number): this;
     getPathSegments(): string[];
     setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder;
     addPath(path: string, params?: Record<string, ParamType>): UrlBuilder;
-    getParams(): Map<string, ParamType>;
-    findParams(predicate: ParamFindPredicate): Map<string, ParamType>;
-    setParams(params: Map<string, ParamType>): UrlBuilder;
-    addParam(key: string, value: ParamType): UrlBuilder;
-    addOrReplaceParam(key: string, value: ParamType): UrlBuilder;
-    addParams(params: Record<string, ParamType>): UrlBuilder;
-    addOrReplaceParams(params: Record<string, ParamType>): UrlBuilder;
-    getQueryParams(): Map<string, ParamType>;
-    findQueryParams(predicate: ParamFindPredicate): Map<string, ParamType>;
-    setQueryParams(query: Map<string, ParamType>): UrlBuilder;
-    addQueryParam(key: string, value: ParamType): UrlBuilder;
-    addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder;
-    addQueryParams(queries: Record<string, ParamType>): UrlBuilder;
-    addOrReplaceQueryParams(queries: Record<string, ParamType>): UrlBuilder;
-    setFilename(filename: string): UrlBuilder;
-    setFile(file: FileInterface): UrlBuilder;
-    getFile(): FileInterface;
+    getPathParams(): PathParams;
+    setPathParams(params: PathParams): this;
+    getQueryParams(): QueryParams;
+    setQueryParams(query: QueryParams): this;
+    setFilename(filename: string): this;
+    setFile(file: IFile): this;
+    getFile(): IFile;
     getFragment(): string;
-    setFragment(fragment: string): UrlBuilder;
+    setFragment(fragment: string): this;
     /**
-     * Merge path segments, params and queryParams with passed UrlBuilder
+     * Merge path segments, pathParams and queryParams with passed UrlBuilder
      * @param url to merge path
      */
-    mergePathWith(url: UrlBuilder): UrlBuilder;
+    mergePathWith(url: UrlBuilder): this;
     /**
      * Get first path segment
      */
@@ -102,17 +81,13 @@ export declare class UrlBuilder {
      * @param a first segment to search
      * @param b last segment to search
      */
-    getBetween2Segments(a: string, b: string): string;
+    getBetween2Segments(a: string, b: string): string | null;
     /**
      * Get relative path
-     * @param withQuery true to get queryParams params
+     * @param withQuery true to get queryParams pathParams
      * @param withFragment true to get fragment
      */
     getRelativePath(withQuery?: boolean, withFragment?: boolean): string;
-    /**
-     * Get queryParams params as string
-     */
-    getQueryString(): string;
     /**
      * Convert full UrlBuilder to string url
      */
