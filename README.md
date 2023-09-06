@@ -323,7 +323,7 @@ const url = UrlBuilder.createFromUrl('http://localhost:8080/vehicles').addQueryP
   page: 2,
   order: 'ASC',
 });
-url.getQueryString(); // Output: '?page=2&order=ASC'
+url.getQueryParams().toString(); // Output: '?page=2&order=ASC'
 ```
 
 ### Convert full URL to string
