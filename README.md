@@ -27,11 +27,19 @@ A lightweight library with many features to easy build URLs
 - [Authors](#busts_in_silhouette-authors)
 - [Contributors](#handshake-contributors)
 
-**Breaking changes from 1.x to 2.x :**
-- `UrlBuilder#addParam` does not replace existing param now. Use `UrlBuilder#addOrReplaceParam` now
-- `UrlBuilder#addParams` does not replace existing params now. Use `UrlBuilder#addOrReplaceParams` now
-- `UrlBuilder#addQueryParam` does not replace existing param now. Use `UrlBuilder#addOrReplaceQueryParam` now
-- `UrlBuilder#addQueryParams` does not replace existing params now. Use `UrlBuilder#addOrReplaceQueryParams` now
+> [!WARNING]  
+> Breaking changes from 2.x to 3.x
+- `UrlBuilder#addParam()` has been removed. Use `UrlBuilder#getPathParams().add()` instead
+- `UrlBuilder#addParams()` has been removed. Use `UrlBuilder#getPathParams().addAll()` instead
+- `UrlBuilder#addOrReplaceParam()` has been removed. Use `UrlBuilder#getPathParams().set()` instead
+- `UrlBuilder#addOrReplaceParams()` has been removed. Use `UrlBuilder#getPathParams().setAll()` instead
+- `UrlBuilder#findParams()` has been removed. Use `UrlBuilder#getPathParams().find()` instead
+- `UrlBuilder#addQueryParam()` has been removed. Use `UrlBuilder#getQueryParams().add()` instead
+- `UrlBuilder#addQueryParams()` has been removed. Use `UrlBuilder#getQueryParams().addAll()` instead
+- `UrlBuilder#addOrReplaceQueryParam()` has been removed. Use `UrlBuilder#getQueryParams().set()` instead
+- `UrlBuilder#addOrReplaceQueryParams()` has been removed. Use `UrlBuilder#getQueryParams().setAll()` instead
+- `UrlBuilder#findQueryParams()` has been removed. Use `UrlBuilder#getQueryParams().find()` instead
+- `UrlBuilder#getQueryString()` has been removed. Use `UrlBuilder#getQueryParams().toString()` instead
 
 ## :bookmark_tabs: Features
 This library allows :
