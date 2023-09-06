@@ -54,10 +54,14 @@ const url = UrlBuilder.createFromUrl('http://localhost:8080/users');
 ```
 
 ### Handle path
-Add new path segment(s)
+Add new path segment(s) and params
+> [!NOTE]
+> All methods (except getBaseUrl) on PathParams object (by `getPathParams()`), return the current PathParams object and not the current UrlBuilder object
+> [!NOTE]
+> The `add()` and `addAll()` methods on PathParams object does not add the entry if the key already exists. Use `set()` or `setAll()` instead
 ```ts
 const userId = '170b16cd-ad47-4c9c-86cf-7c83bd40d775';
-url.addPath(':id/comments').addParam('id', userId);
+url.addPath(':id/comments').getPathParams().add('id', userId);
 // Or
 url.addPath(':id/comments', { id: userId });
 ```
@@ -65,50 +69,49 @@ Add multiples parameters after adding path segment(s)
 ```ts
 const userId = '170b16cd-ad47-4c9c-86cf-7c83bd40d775';
 const commentId = '218dd1c4-0bb0-425a-be0b-85427304e100';
-url.addPath(':userId/comments/:commentId').addParams({ userId, commentId });
+url.addPath(':userId/comments/:commentId').getPathParams().addAll({ userId, commentId });
 // Or
 url.addPath(':userId/comments/:commentId', { userId, commentId });
 ```
-If you want to add or replace existing param, use instead :
+If you want to add or replace existing param(s), use instead :
 ```ts
 const userId = '170b16cd-ad47-4c9c-86cf-7c83bd40d775';
 const commentId = '218dd1c4-0bb0-425a-be0b-85427304e100';
-url.addPath(':userId/comments/:commentId')
-        .addParams({ userId: 3, commentId: 1 });
+url.addPath(':userId/comments/:commentId', { userId: 3, commentId: 1 });
 
 // Without replacement :
-url.addParam('userId', userId);
+url.getPathParams().add('userId', userId);
 // Param 'userId' is always : 3
 
 // With replacement :
-url.addOrReplaceParam('userId', userId);
+url.getPathParams().set('userId', userId);
 // Param 'userId' is now : 170b16cd-ad47-4c9c-86cf-7c83bd40d775
 
 
 // Or with multiples parameters
 // Without replacement :
-url.addParams({ userId: 10, commentId: 5 });
+url.getPathParams().addAll({ userId: 10, commentId: 5 });
 // Param 'userId' is always : 170b16cd-ad47-4c9c-86cf-7c83bd40d775
 // Param 'commentId' is always : 1
 
 // With replacement :
-url.addOrReplaceParams({ userId: 10, commentId: 5 });
+url.getPathParams().setAll({ userId: 10, commentId: 5 });
 // Param 'userId' is now : 10
 // Param 'commentId' is now : 5
 ```
 Retrieve params
 ```ts
 const url = new UrlBuilder()
-    .addParams({
+    .getPathParams().addAll({
       startDate: '1679737680454',
       endDate: '1679937680454',
     });
 
-const params = url.getParams();
-// params contain all path params as Map
+const params = url.getPathParams();
+// params contains all path params as Map
 
-const filteredParams = url.findParams(([key, value]) => new Date(Number(value)).getDate() === 25);
-// filteredParams contain a new Map only with param 'startDate'
+const filteredParams = url.getPathParams().filter(([key, value]) => new Date(Number(value)).getDate() === 25);
+// filteredParams contains a new Map only with param 'startDate'
 ```
 Get the first path segment
 ```ts
@@ -120,49 +123,65 @@ Get the last path segment
 ```ts
 url.getLastPath(); // Output: 'cells'
 ```
+Delete some path params
+```ts
+const url = new UrlBuilder()
+    .getPathParams().addAll({
+      startDate: '1679737680454',
+      endDate: '1679937680454',
+    });
+
+url.getPathParams().deleteBy(([key, value]) => new Date(Number(value)).getDate() === 25);
+// PathParams no longer contains param 'endDate'
+```
 
 ### Handle query param
+> [!NOTE]
+> All methods (except getBaseUrl) on QueryParams object (by `getQueryParams()`), return the current QueryParams object and not the current UrlBuilder object
+>
+> [!NOTE]
+> The `add()` and `addAll()` methods on QueryParams object does not add the entry if the key already exists. Use `set()` or `setAll()` instead
 Add new query param
 ```ts
 const page = 2;
-url.addQueryParam('page', page);
+url.getQueryParams().add('page', page);
 ```
 Add multiples query params
 ```ts
 const page = 2;
 const order = 'DESC';
-url.addQueryParams({ page, order });
+url.getQueryParams().addAll({ page, order });
 ```
 If you want to add or replace existing query, use instead :
 ```ts
 const page = 2;
 const order = 'DESC';
-url.addQueryParams({ page, order });
+url.getQueryParams().addAll({ page, order });
 
 // Without replacement :
-url.addQueryParam('page', 3);
+url.getQueryParams().add('page', 3);
 // QueryParam 'page' is always : 2
 
 // With replacement :
-url.addOrReplaceQueryParam('page', 3);
+url.getQueryParams().set('page', 3);
 // QueryParam 'page' is now : 3
 
 
 // Or with multiples parameters
 // Without replacement :
-url.addQueryParams({ page: 4, order: 'ASC' });
+url.getQueryParams().addAll({ page: 4, order: 'ASC' });
 // QueryParam 'page' is always : 3
 // QueryParam 'order' is always : DESC
 
 // With replacement :
-url.addOrReplaceQueryParams({ page: 4, order: 'ASC' });
+url.getQueryParams().setAll({ page: 4, order: 'ASC' });
 // QueryParam 'page' is now : 4
 // QueryParam 'order' is now : ASC
 ```
 Retrieve query params
 ```ts
 const url = new UrlBuilder()
-    .addQueryParams({
+    .getQueryParams().addAll({
       style: 'dark',
       utm_source: 'Google',
       utm_medium: 'newsletter',
@@ -171,10 +190,24 @@ const url = new UrlBuilder()
     });
 
 const queryParams = url.getQueryParams();
-// queryParams contain all query params as Map
+// queryParams contains all query params as Map
 
-const filteredQueryParams = url.findQueryParams(([key]) => key.startsWith('utm'));
-// filteredQueryParams contain a new Map only with query params 'utm_source', 'utm_medium' and 'utm_campaign'
+const filteredQueryParams = url.getQueryParams().filter(([key]) => key.startsWith('utm'));
+// filteredQueryParams contains a new Map only with query params 'utm_source', 'utm_medium' and 'utm_campaign'
+```
+Delete some query params
+```ts
+const url = new UrlBuilder()
+    .getQueryParams().addAll({
+      style: 'dark',
+      utm_source: 'Google',
+      utm_medium: 'newsletter',
+      utm_campaign: 'summer',
+      isMobile: 1
+    });
+
+url.getQueryParams().deleteBy(([key]) => key.startsWith('utm'));
+// QueryParams no longer contains query params 'utm_source', 'utm_medium' and 'utm_campaign'
 ```
 
 ### Handle file
@@ -369,53 +402,70 @@ interface FileInterface {
 
 ### UrlBuilder
 ```ts
-static createFromUrl(baseUrl: string): UrlBuilder
-compareTo(url: UrlBuilder, relative = true): boolean
-compareToPathBySegment(path: string, validateUnfilledParams = false): boolean
-getScheme(): Scheme
-setScheme(scheme: Scheme): UrlBuilder
-getHost(): string
-setHost(host: string): UrlBuilder
-getPort(): numbe
-setPort(port: number): UrlBuilder
-getPathSegments(): string[]
-setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder
-addPath(path: string, params?: Record<string, ParamType>): UrlBuilder
-getParams(): Map<string, ParamType>
-findParams(predicate: ParamFindPredicate): Map<string, ParamType>
-setParams(params: Map<string, ParamType>): UrlBuilder
-addParam(key: string, value: ParamType): UrlBuilder
-addOrReplaceParam(key: string, value: ParamType): UrlBuilder
-addParams(params: Record<string, ParamType>): UrlBuilder
-addOrReplaceParams(params: Record<string, ParamType>): UrlBuilder
-getQueryParams(): Map<string, ParamType>
-findQueryParams(predicate: ParamFindPredicate): Map<string, ParamType>
-setQueryParams(query: Map<string, ParamType>): UrlBuilder
-addQueryParam(key: string, value: ParamType): UrlBuilder
-addOrReplaceQueryParam(key: string, value: ParamType): UrlBuilder
-addQueryParams(queries: Record<string, ParamType>): UrlBuilder
-addOrReplaceQueryParams(queries: Record<string, ParamType>): UrlBuilder
-setFilename(filename: string): UrlBuilder
-setFile(file: FileInterface): UrlBuilder
-getFile(): FileInterface
-getFragment(): string
-setFragment(fragment: string): UrlBuilder
-mergePathWith(url: UrlBuilder): UrlBuilder
-getFirstPathSegment(): string
-getLastPathSegment(): string
-getParent(n = 1): UrlBuilder
-getBetween2Segments(a: string, b: string): string
-getRelativePath(query = false, withFragment = false): string
-getQueryString(): string
-toString(): string
+static createFromUrl(baseUrl: string, isFile?: boolean): UrlBuilder;
+copy(): UrlBuilder;
+compareTo(url: UrlBuilder, relative?: boolean): boolean;
+compareToPathBySegment(path: string, validateUnfilledParams?: boolean): boolean;
+getScheme(): Scheme;
+setScheme(scheme: Scheme): this;
+getHost(): string;
+setHost(host: string): this;
+getPort(): number;
+setPort(port: number): this;
+getPathSegments(): string[];
+setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder;
+addPath(path: string, params?: Record<string, ParamType>): UrlBuilder;
+getPathParams(): PathParams;
+setPathParams(params: PathParams): this;
+getQueryParams(): QueryParams;
+setQueryParams(query: QueryParams): this;
+setFilename(filename: string): this;
+setFile(file: IFile): this;
+getFile(): IFile;
+getFragment(): string;
+setFragment(fragment: string): this;
+mergePathWith(url: UrlBuilder): this;
+getFirstPathSegment(): string;
+getFirstPath(): string;
+getLastPathSegment(): string;
+getLastPath(): string;
+getParent(n?: number): UrlBuilder;
+getBetween2Segments(a: string, b: string): string | null;
+getRelativePath(withQuery?: boolean, withFragment?: boolean): string;
+toString(): string;
 ```
 > **Note** : Only the non-static getParent() method return new instance of UrlBuilder. Others update and return the current instance.
 
+### PathParams (`extends Map<string, ParamType>`)
+```ts
+constructor(baseUrl?: UrlBuilder, entries?: readonly (readonly [string, ParamType])[] | null);
+getAll(): { [key: string]: ParamType };
+add(key: string, value: ParamType): this;
+addAll(params: Record<string, ParamType>): this;
+setAll(params: Record<string, ParamType>): this;
+deleteBy(predicate: ParamFindPredicate): this;
+getBaseUrl(): UrlBuilder;
+filter(predicate: ParamFindPredicate): PathParams;
+```
+
+### QueryParams (`extends Map<string, ParamType>`)
+```ts
+constructor(baseUrl?: UrlBuilder, entries?: readonly (readonly [string, ParamType])[] | null);
+getAll(): { [key: string]: ParamType };
+add(key: string, value: ParamType): this;
+addAll(params: Record<string, ParamType>): this;
+setAll(params: Record<string, ParamType>): this;
+deleteBy(predicate: ParamFindPredicate): this;
+getBaseUrl(): UrlBuilder;
+filter(predicate: ParamFindPredicate): QueryParams;
+toString(): string;
+```
+
 ### UrlUtils (namespace)
 ```ts
-splitPath(path: string): string[]
-trimPath(path: string): string
-parseFile = (filename: string): FileInterface
+splitPath(path: string): string[];
+trimPath(path: string): string;
+parseFile = (filename: string): FileInterface;
 ```
 
 ## :balance_scale: Licence
