@@ -8,4 +8,4 @@ var UrlConstants;
     UrlConstants.URL_PATH_PREFIX = ':';
     UrlConstants.URL_PATH_SEPARATOR = '/';
     UrlConstants.URL_EXT_SEPARATOR = '.';
-})(UrlConstants || (exports.UrlConstants = UrlConstants = {}));
+})(UrlConstants = exports.UrlConstants || (exports.UrlConstants = {}));

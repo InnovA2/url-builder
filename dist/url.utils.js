@@ -34,4 +34,4 @@ var UrlUtils;
         }
         return null;
     };
-})(UrlUtils || (exports.UrlUtils = UrlUtils = {}));
+})(UrlUtils = exports.UrlUtils || (exports.UrlUtils = {}));

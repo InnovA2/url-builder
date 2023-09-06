@@ -9,4 +9,4 @@ var UrlComponent;
     UrlComponent["PATHS"] = "paths";
     UrlComponent["PARAMS"] = "params";
     UrlComponent["QUERY"] = "query";
-})(UrlComponent || (exports.UrlComponent = UrlComponent = {}));
+})(UrlComponent = exports.UrlComponent || (exports.UrlComponent = {}));

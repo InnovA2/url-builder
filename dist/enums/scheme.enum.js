@@ -5,4 +5,4 @@ var Scheme;
 (function (Scheme) {
     Scheme["HTTP"] = "http";
     Scheme["HTTPS"] = "https";
-})(Scheme || (exports.Scheme = Scheme = {}));
+})(Scheme = exports.Scheme || (exports.Scheme = {}));
