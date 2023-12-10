@@ -59,7 +59,7 @@ export class UrlBuilder {
     copy(): UrlBuilder {
         const url = new UrlBuilder();
         for (const [key, value] of Object.entries(this)) {
-            url[key] = this.propertyMapping(value);
+            url[key] = url.propertyMapping(value);
         }
         return url;
     }
