@@ -153,6 +153,11 @@ export class UrlBuilder {
         return this;
     }
 
+    addQueryParam(key: string, value: ParamType): this {
+        this.getQueryParams().add(key, value)
+        return this;
+    }
+
     setFilename(filename: string): this {
         this.file = UrlUtils.parseFile(filename);
         return this;
@@ -193,30 +198,14 @@ export class UrlBuilder {
      * Get first path segment
      */
     getFirstPathSegment(): string {
-        return this.pathSegments.length ? this.pathSegments[0] : null;
-    }
-
-    /**
-     * Get first path segment.
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getFirstPathSegment()** instead.
-     */
-    getFirstPath(): string {
-        return this.getFirstPathSegment();
+        return this.pathSegments?.[0];
     }
 
     /**
      * Get last path segment
      */
     getLastPathSegment(): string {
-        return this.pathSegments.length ? this.pathSegments[this.pathSegments.length - 1] : null;
-    }
-
-    /**
-     * Get last path segment
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getLastPathSegment()** instead.
-     */
-    getLastPath(): string {
-        return this.getLastPathSegment();
+        return this.pathSegments?.[this.pathSegments.length - 1];
     }
 
     /**

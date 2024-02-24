@@ -1,8 +1,7 @@
-import { UrlBuilder } from "../src";
-import { Scheme } from "../src/enums/scheme.enum";
+import { UrlBuilder } from '../src';
+import { Scheme } from '../src/enums/scheme.enum';
 import { QueryParams } from '../src/maps/query-params';
 import { PathParams } from '../src/maps/path-params';
-import * as path from 'path';
 
 describe('UrlBuilder', () => {
     const base_url = 'https://localhost';
@@ -207,6 +206,14 @@ describe('UrlBuilder', () => {
         expect(url.getRelativePath(true)).toBe('/users?page=3&order=DESC');
     });
 
+    test('should add query param by shortcut addQueryParam', () => {
+        const url: UrlBuilder = new UrlBuilder()
+            .addPath('users')
+            .addQueryParam('page', 1);
+
+        expect(url.getQueryParams().has('page')).toBe(true);
+    });
+
     test('should get the same query params', () => {
         const url: UrlBuilder = new UrlBuilder()
             .addPath('users')
@@ -313,13 +320,13 @@ describe('UrlBuilder', () => {
     test('should get first path', () => {
         const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
 
-        expect(url.getFirstPath()).toBe('users');
+        expect(url.getFirstPathSegment()).toBe('users');
     });
 
     test('should get last path', () => {
         const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
 
-        expect(url.getLastPath()).toBe('comments');
+        expect(url.getLastPathSegment()).toBe('comments');
     });
 
     test('should get parent', () => {

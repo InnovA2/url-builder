@@ -34,7 +34,6 @@ A lightweight library with many features to easy build URLs
 - `UrlBuilder#addOrReplaceParam()` has been removed. Use `UrlBuilder#getPathParams().set()` instead
 - `UrlBuilder#addOrReplaceParams()` has been removed. Use `UrlBuilder#getPathParams().setAll()` instead
 - `UrlBuilder#findParams()` has been removed. Use `UrlBuilder#getPathParams().find()` instead
-- `UrlBuilder#addQueryParam()` has been removed. Use `UrlBuilder#getQueryParams().add()` instead
 - `UrlBuilder#addQueryParams()` has been removed. Use `UrlBuilder#getQueryParams().addAll()` instead
 - `UrlBuilder#addOrReplaceQueryParam()` has been removed. Use `UrlBuilder#getQueryParams().set()` instead
 - `UrlBuilder#addOrReplaceQueryParams()` has been removed. Use `UrlBuilder#getQueryParams().setAll()` instead
@@ -146,13 +145,16 @@ url.getPathParams().deleteBy(([key, value]) => new Date(Number(value)).getDate()
 ### Handle query param
 > [!NOTE]
 > All methods (except getBaseUrl) on QueryParams object (by `getQueryParams()`), return the current QueryParams object and not the current UrlBuilder object
->
+
 > [!NOTE]
 > The `add()` and `addAll()` methods on QueryParams object does not add the entry if the key already exists. Use `set()` or `setAll()` instead
 Add new query param
 ```ts
 const page = 2;
 url.getQueryParams().add('page', page);
+
+// or
+url.addQueryParam('page', page);
 ```
 Add multiples query params
 ```ts
@@ -319,11 +321,11 @@ url.getRelativePath(true); // Output: '/posts/a937b39e-9664-404a-ac56-f3da2b83a9
 ### Get query params as string
 Retrieve the query params as string format
 ```ts
-const url = UrlBuilder.createFromUrl('http://localhost:8080/vehicles').addQueryParams({
+const queryParams = UrlBuilder.createFromUrl('http://localhost:8080/vehicles').getQueryParams().setAll({
   page: 2,
   order: 'ASC',
 });
-url.getQueryParams().toString(); // Output: '?page=2&order=ASC'
+queryParams.toString(); // Output: '?page=2&order=ASC'
 ```
 
 ### Convert full URL to string
