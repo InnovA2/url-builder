@@ -43,6 +43,7 @@ export declare class UrlBuilder {
     setPathParams(params: PathParams): this;
     getQueryParams(): QueryParams;
     setQueryParams(query: QueryParams): this;
+    addQueryParam(key: string, value: ParamType): this;
     setFilename(filename: string): this;
     setFile(file: IFile): this;
     getFile(): IFile;
@@ -58,19 +59,9 @@ export declare class UrlBuilder {
      */
     getFirstPathSegment(): string;
     /**
-     * Get first path segment.
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getFirstPathSegment()** instead.
-     */
-    getFirstPath(): string;
-    /**
      * Get last path segment
      */
     getLastPathSegment(): string;
-    /**
-     * Get last path segment
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getLastPathSegment()** instead.
-     */
-    getLastPath(): string;
     /**
      * Get parent of the current url (e.g. /users/:id/groups -> /users/:id)
      * @param n offset/level

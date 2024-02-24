@@ -125,6 +125,10 @@ class UrlBuilder {
         this.queryParams = query;
         return this;
     }
+    addQueryParam(key, value) {
+        this.getQueryParams().add(key, value);
+        return this;
+    }
     setFilename(filename) {
         this.file = url_utils_1.UrlUtils.parseFile(filename);
         return this;
@@ -158,27 +162,15 @@ class UrlBuilder {
      * Get first path segment
      */
     getFirstPathSegment() {
-        return this.pathSegments.length ? this.pathSegments[0] : null;
-    }
-    /**
-     * Get first path segment.
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getFirstPathSegment()** instead.
-     */
-    getFirstPath() {
-        return this.getFirstPathSegment();
+        var _a;
+        return (_a = this.pathSegments) === null || _a === void 0 ? void 0 : _a[0];
     }
     /**
      * Get last path segment
      */
     getLastPathSegment() {
-        return this.pathSegments.length ? this.pathSegments[this.pathSegments.length - 1] : null;
-    }
-    /**
-     * Get last path segment
-     * @deprecated Deprecated since version 2.3.0 and will be removed on 3.0.0. Use **getLastPathSegment()** instead.
-     */
-    getLastPath() {
-        return this.getLastPathSegment();
+        var _a;
+        return (_a = this.pathSegments) === null || _a === void 0 ? void 0 : _a[this.pathSegments.length - 1];
     }
     /**
      * Get parent of the current url (e.g. /users/:id/groups -> /users/:id)
