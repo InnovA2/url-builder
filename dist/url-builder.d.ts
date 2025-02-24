@@ -13,10 +13,11 @@ export declare class UrlBuilder {
     private file;
     /**
      * Create UrlBuilder instance from string url
-     * @param baseUrl
+     * @param url the url (if it does not contain the domain, please fill in the "base" parameter)
+     * @param base the default base url, required only if the "url" param does not contain the domain
      * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
-    static createFromUrl(baseUrl: string, isFile?: boolean): UrlBuilder;
+    static createFromUrl(url: string, defaultBase?: string, isFile?: boolean): UrlBuilder;
     copy(): UrlBuilder;
     /**
      * Compare the current UrlBuilder to another

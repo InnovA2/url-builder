@@ -57,6 +57,8 @@ npm install @innova2/url-builder
 ### Create from existing URL
 ```ts
 const url = UrlBuilder.createFromUrl('http://localhost:8080/users');
+// or
+const url = UrlBuilder.createFromUrl('/users', 'http://localhost:8080');
 // or create new url with the constructor
 ```
 
@@ -412,7 +414,7 @@ interface FileInterface {
 
 ### UrlBuilder
 ```ts
-static createFromUrl(baseUrl: string, isFile?: boolean): UrlBuilder;
+static createFromUrl(url: string, defaultBase?: string, isFile?: boolean): UrlBuilder;
 copy(): UrlBuilder;
 compareTo(url: UrlBuilder, relative?: boolean): boolean;
 compareToPathBySegment(path: string, validateUnfilledParams?: boolean): boolean;

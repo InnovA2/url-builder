@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UrlBuilder = void 0;
-const urlParser = require("url-parse");
 const scheme_enum_1 = require("./enums/scheme.enum");
 const url_constants_1 = require("./url.constants");
 const url_utils_1 = require("./url.utils");
@@ -16,34 +15,35 @@ class UrlBuilder {
     }
     /**
      * Create UrlBuilder instance from string url
-     * @param baseUrl
+     * @param url the url (if it does not contain the domain, please fill in the "base" parameter)
+     * @param base the default base url, required only if the "url" param does not contain the domain
      * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
-    static createFromUrl(baseUrl, isFile = false) {
-        const url = new UrlBuilder();
-        const items = urlParser(baseUrl, true);
+    static createFromUrl(url, defaultBase, isFile = false) {
+        const builder = new UrlBuilder();
+        const items = new URL(url, defaultBase);
         if (items.protocol) {
-            url.scheme = (items.protocol.slice(0, -1));
+            builder.scheme = (items.protocol.slice(0, -1));
         }
-        url.host = items.hostname;
+        builder.host = items.hostname;
         if (items.port) {
-            url.port = +items.port;
+            builder.port = +items.port;
         }
         const segments = url_utils_1.UrlUtils.splitPath(items.pathname.replace(url_constants_1.UrlConstants.REGEX_BRACE_PARAMS, `${url_constants_1.UrlConstants.URL_PATH_PREFIX}$2`));
         if (isFile && segments.length > 0 && segments[segments.length - 1]) {
-            url.file = url_utils_1.UrlUtils.parseFile(segments[segments.length - 1]);
-            if (url.file) {
+            builder.file = url_utils_1.UrlUtils.parseFile(segments[segments.length - 1]);
+            if (builder.file) {
                 segments.splice(-1);
             }
         }
-        url.pathSegments = segments;
-        if (items.query) {
-            for (const [key, value] of Object.entries(items.query)) {
-                url.queryParams.set(key, String(value));
+        builder.pathSegments = segments;
+        if (items.searchParams) {
+            for (const [key, value] of items.searchParams.entries()) {
+                builder.queryParams.set(key, String(value));
             }
         }
-        url.fragment = items.hash.slice(1);
-        return url;
+        builder.fragment = items.hash.slice(1);
+        return builder;
     }
     copy() {
         const url = new UrlBuilder();

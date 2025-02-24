@@ -12,9 +12,6 @@
     "test:cov": "jest --coverage && make-coverage-badge",
     "release": "npm run test:cov && tsc && git add coverage/. dist/. && npm version $npm_config_release_version -f && npm publish --access=public && git push origin main --tags"
   },
-  "dependencies": {
-    "url-parse": "^1.5.10"
-  },
   "devDependencies": {
     "@types/jest": "^29.2.4",
     "jest": "^29.3.1",

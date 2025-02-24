@@ -1,4 +1,3 @@
-import * as urlParser from 'url-parse';
 import { Scheme } from './enums/scheme.enum';
 import { UrlConstants } from './url.constants';
 import { ParamType, IFile } from './types';
@@ -12,48 +11,49 @@ export class UrlBuilder {
     private port: number;
     private pathSegments: string[] = [];
     private pathParams = new PathParams(this);
-    private queryParams = new QueryParams(this);
+    private queryParams = new QueryParams(this)
     private fragment: string;
     private file: IFile;
 
     /**
      * Create UrlBuilder instance from string url
-     * @param baseUrl
+     * @param url the url (if it does not contain the domain, please fill in the "base" parameter)
+     * @param base the default base url, required only if the "url" param does not contain the domain
      * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
-    static createFromUrl(baseUrl: string, isFile = false): UrlBuilder {
-        const url = new UrlBuilder();
+    static createFromUrl(url: string, defaultBase?: string, isFile = false): UrlBuilder {
+        const builder = new UrlBuilder();
 
-        const items = urlParser(baseUrl, true);
+        const items = new URL(url, defaultBase);
 
         if (items.protocol) {
-            url.scheme = (items.protocol.slice(0, -1)) as Scheme;
+            builder.scheme = (items.protocol.slice(0, -1)) as Scheme;
         }
 
-        url.host = items.hostname;
+        builder.host = items.hostname;
 
         if (items.port) {
-            url.port = +items.port;
+            builder.port = +items.port;
         }
 
         const segments = UrlUtils.splitPath(items.pathname.replace(UrlConstants.REGEX_BRACE_PARAMS, `${UrlConstants.URL_PATH_PREFIX}$2`));
         if (isFile && segments.length > 0 && segments[segments.length - 1]) {
-            url.file = UrlUtils.parseFile(segments[segments.length - 1]);
-            if (url.file) {
+            builder.file = UrlUtils.parseFile(segments[segments.length - 1]);
+            if (builder.file) {
                 segments.splice(-1);
             }
         }
-        url.pathSegments = segments;
+        builder.pathSegments = segments;
 
-        if (items.query) {
-            for (const [key, value] of Object.entries(items.query)) {
-                url.queryParams.set(key, String(value));
+        if (items.searchParams) {
+            for (const [key, value] of items.searchParams.entries()) {
+                builder.queryParams.set(key, String(value));
             }
         }
 
-        url.fragment = items.hash.slice(1);
+        builder.fragment = items.hash.slice(1);
 
-        return url;
+        return builder;
     }
 
     copy(): UrlBuilder {

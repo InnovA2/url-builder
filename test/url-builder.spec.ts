@@ -32,6 +32,12 @@ describe('UrlBuilder', () => {
         expect(url.toString()).toBe(url_users_paginated_with_port + '&order=DESC');
     });
 
+    test('should parse existing url with default domain', () => {
+        const url: UrlBuilder = UrlBuilder.createFromUrl(path_users_with_qp, 'http://localhost:8080');
+
+        expect(url.toString()).toBe('http://localhost:8080/users?page=1&order=ASC');
+    });
+
     test('should copy url', () => {
         const usersUrl = UrlBuilder.createFromUrl(base_url).addPath('users/:id', { id: 2 });
         const ticketsUrl = usersUrl.copy().addPath('tickets').setFilename('index.html');
@@ -43,8 +49,8 @@ describe('UrlBuilder', () => {
     });
 
     test('should compare urls', () => {
-        const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
-        const url2: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        const url: UrlBuilder = new UrlBuilder().addPath(path_user_comments);
+        const url2: UrlBuilder = new UrlBuilder().addPath(path_user_comments);
         const url3: UrlBuilder = UrlBuilder.createFromUrl(url_users_paginated_with_port);
 
         expect(url.compareTo(url2)).toBe(true);
@@ -55,19 +61,19 @@ describe('UrlBuilder', () => {
     });
 
     test('should compare segments', () => {
-        const url: UrlBuilder = UrlBuilder.createFromUrl('/user');
+        const url: UrlBuilder = new UrlBuilder().addPath('/user');
         expect(url.compareToPathBySegment(path_user_comments)).toBe(false);
 
-        const url2: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        const url2: UrlBuilder = new UrlBuilder().addPath(path_user_comments);
         expect(url2.compareToPathBySegment('/users')).toBe(false);
 
-        const url3: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        const url3: UrlBuilder = new UrlBuilder().addPath(path_user_comments);
         expect(url3.compareToPathBySegment(path_user_comments)).toBe(true);
 
-        const url4: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
+        const url4: UrlBuilder = new UrlBuilder().addPath('/users/:id/comments');
         expect(url4.compareToPathBySegment(path_user_comments)).toBe(false);
 
-        const url5: UrlBuilder = UrlBuilder.createFromUrl('/users/:id/comments');
+        const url5: UrlBuilder = new UrlBuilder().addPath('/users/:id/comments');
         expect(url5.compareToPathBySegment(path_user_comments, true)).toBe(true);
     });
 
@@ -259,9 +265,9 @@ describe('UrlBuilder', () => {
         const url: UrlBuilder = UrlBuilder
             .createFromUrl(base_url + '/books/719888217.html')
         const url2: UrlBuilder = UrlBuilder
-            .createFromUrl(base_url + '/books/719888217.html', true)
+            .createFromUrl(base_url + '/books/719888217.html', undefined, true)
         const url3: UrlBuilder = UrlBuilder
-            .createFromUrl(base_url + '/books', true)
+            .createFromUrl(base_url + '/books', undefined, true)
 
         expect(url.getFile()).toBeFalsy();
         expect(url.getPathSegments().length).toBe(2);
@@ -318,40 +324,40 @@ describe('UrlBuilder', () => {
     });
 
     test('should get first path', () => {
-        const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        const url = new UrlBuilder().addPath(path_user_comments);
 
         expect(url.getFirstPathSegment()).toBe('users');
     });
 
     test('should get last path', () => {
-        const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        const url = new UrlBuilder().addPath(path_user_comments);
 
         expect(url.getLastPathSegment()).toBe('comments');
     });
 
     test('should get parent', () => {
-        const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comment);
+        const url = new UrlBuilder().addPath(path_user_comment);
 
         expect(url.getParent().getRelativePath()).toBe(path_user_comments);
         expect(url.getParent(3).getRelativePath()).toBe('/users');
     });
 
     test('should get path between two segments', () => {
-        const url: UrlBuilder = UrlBuilder.createFromUrl(path_user_comments);
+        const url = new UrlBuilder().addPath(path_user_comments);
 
         expect(url.getBetween2Segments('users', 'comments')).toBe('10');
         expect(url.getBetween2Segments('user', 'comment')).toBe(null);
     });
 
     test('should get empty relative path', () => {
-        const url: UrlBuilder = new UrlBuilder();
+        const url = new UrlBuilder();
 
         expect(url.getRelativePath()).toBe('');
     });
 
 
     test('should get only query in relative path', () => {
-        const url: UrlBuilder = new UrlBuilder()
+        const url = new UrlBuilder()
             .getQueryParams().add('page', 2)
             .getBaseUrl();
 
@@ -359,7 +365,7 @@ describe('UrlBuilder', () => {
     });
 
     test('should get the same relative path', () => {
-        const url: UrlBuilder = new UrlBuilder()
+        const url = new UrlBuilder()
             .addPath('users/:id/comments', { id: 10 });
 
         expect(url.getRelativePath()).toBe(path_user_comments);
