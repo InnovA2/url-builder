@@ -299,16 +299,16 @@ export class UrlBuilder {
             .join('');
     }
 
-    private propertyMapping(value: any): any {
+    private propertyMapping(value: unknown): any {
         switch (true) {
             case Array.isArray(value):
                 return [...value];
 
             case value instanceof PathParams:
-                return new PathParams(this, value);
+                return new PathParams(this, [...value.entries()]);
 
             case value instanceof QueryParams:
-                return new QueryParams(this, value);
+                return new QueryParams(this, [...value.entries()]);
 
             case typeof value === 'object':
                 return { ...value };
