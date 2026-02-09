@@ -16,7 +16,7 @@ class UrlBuilder {
     /**
      * Create UrlBuilder instance from string url
      * @param url the url (if it does not contain the domain, please fill in the "base" parameter)
-     * @param base the default base url, required only if the "url" param does not contain the domain
+     * @param defaultBase the default base url, required only if the "url" param does not contain the domain
      * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
     static createFromUrl(url, defaultBase, isFile = false) {
@@ -107,6 +107,18 @@ class UrlBuilder {
         this.pathSegments = segments;
         return params ? this.pathParams.addAll(params).getBaseUrl() : this;
     }
+    /**
+     * Delete a path segment by index
+     */
+    deletePathSegment(index) {
+        const segment = this.pathSegments[index];
+        const paramKey = segment === null || segment === void 0 ? void 0 : segment.replace(url_constants_1.UrlConstants.URL_PATH_PREFIX, '');
+        if (paramKey) {
+            this.pathParams.delete(paramKey);
+        }
+        this.pathSegments.splice(index, 1);
+        return this;
+    }
     addPath(path, params) {
         this.pathSegments.push(...url_utils_1.UrlUtils.splitPath(path));
         return params ? this.pathParams.addAll(params).getBaseUrl() : this;
@@ -173,6 +185,12 @@ class UrlBuilder {
         return (_a = this.pathSegments) === null || _a === void 0 ? void 0 : _a[this.pathSegments.length - 1];
     }
     /**
+     * Get path segment by index
+     */
+    getPathSegment(index) {
+        return this.pathSegments[index];
+    }
+    /**
      * Get parent of the current url (e.g. /users/:id/groups -> /users/:id)
      * @param n offset/level
      */
@@ -233,9 +251,9 @@ class UrlBuilder {
             case Array.isArray(value):
                 return [...value];
             case value instanceof path_params_1.PathParams:
-                return new path_params_1.PathParams(this, value);
+                return new path_params_1.PathParams(this, [...value.entries()]);
             case value instanceof query_params_1.QueryParams:
-                return new query_params_1.QueryParams(this, value);
+                return new query_params_1.QueryParams(this, [...value.entries()]);
             case typeof value === 'object':
                 return Object.assign({}, value);
             default:

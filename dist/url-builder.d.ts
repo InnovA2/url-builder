@@ -14,7 +14,7 @@ export declare class UrlBuilder {
     /**
      * Create UrlBuilder instance from string url
      * @param url the url (if it does not contain the domain, please fill in the "base" parameter)
-     * @param base the default base url, required only if the "url" param does not contain the domain
+     * @param defaultBase the default base url, required only if the "url" param does not contain the domain
      * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
     static createFromUrl(url: string, defaultBase?: string, isFile?: boolean): UrlBuilder;
@@ -39,6 +39,10 @@ export declare class UrlBuilder {
     setPort(port: number): this;
     getPathSegments(): string[];
     setPathSegments(segments: string[], params?: Record<string, ParamType>): UrlBuilder;
+    /**
+     * Delete a path segment by index
+     */
+    deletePathSegment(index: number): UrlBuilder;
     addPath(path: string, params?: Record<string, ParamType>): UrlBuilder;
     getPathParams(): PathParams;
     setPathParams(params: PathParams): this;
@@ -63,6 +67,10 @@ export declare class UrlBuilder {
      * Get last path segment
      */
     getLastPathSegment(): string;
+    /**
+     * Get path segment by index
+     */
+    getPathSegment(index: number): string | undefined;
     /**
      * Get parent of the current url (e.g. /users/:id/groups -> /users/:id)
      * @param n offset/level

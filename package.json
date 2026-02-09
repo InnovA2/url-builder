@@ -1,6 +1,6 @@
 {
   "name": "@innova2/url-builder",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "A lightweight library with many feature to easy build URLs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "vitest",
     "test:cov": "vitest run --coverage && coverage-badges-cli",
-    "release": "npm run test:cov && tsc && git add coverage/. dist/. && npm version $npm_config_release_version -f && npm publish --access=public && git push origin main --tags"
+    "release": "npm run test:cov && tsc && git add coverage/. dist/. && npm version $RELEASE_VERSION -f && npm publish --access=public && git push origin main --tags"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
