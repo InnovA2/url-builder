@@ -18,7 +18,7 @@ export class UrlBuilder {
     /**
      * Create UrlBuilder instance from string url
      * @param url the url (if it does not contain the domain, please fill in the "base" parameter)
-     * @param base the default base url, required only if the "url" param does not contain the domain
+     * @param defaultBase the default base url, required only if the "url" param does not contain the domain
      * @param isFile true if the URL contains filename (e.g. http://localhost/books/10.html -> 10.html)
      */
     static createFromUrl(url: string, defaultBase?: string, isFile = false): UrlBuilder {
@@ -130,6 +130,20 @@ export class UrlBuilder {
         return params ? this.pathParams.addAll(params).getBaseUrl() : this;
     }
 
+    /**
+     * Delete a path segment by index
+     */
+    deletePathSegment(index: number): UrlBuilder {
+        const segment = this.pathSegments[index];
+        const paramKey = segment?.replace(UrlConstants.URL_PATH_PREFIX, '');
+
+        if (paramKey) {
+            this.pathParams.delete(paramKey);
+        }
+        this.pathSegments.splice(index, 1);
+        return this;
+    }
+
     addPath(path: string, params?: Record<string, ParamType>): UrlBuilder {
         this.pathSegments.push(...UrlUtils.splitPath(path));
         return params ? this.pathParams.addAll(params).getBaseUrl() : this;
@@ -206,6 +220,13 @@ export class UrlBuilder {
      */
     getLastPathSegment(): string {
         return this.pathSegments?.[this.pathSegments.length - 1];
+    }
+
+    /**
+     * Get path segment by index
+     */
+    getPathSegment(index: number): string | undefined {
+        return this.pathSegments[index];
     }
 
     /**

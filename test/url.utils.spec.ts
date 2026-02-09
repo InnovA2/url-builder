@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { UrlUtils } from '../src/url.utils';
 
 describe('UrlUtils', () => {

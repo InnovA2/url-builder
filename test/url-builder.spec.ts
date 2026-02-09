@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { UrlBuilder } from '../src';
 import { Scheme } from '../src/enums/scheme.enum';
 import { QueryParams } from '../src/maps/query-params';
@@ -109,6 +110,13 @@ describe('UrlBuilder', () => {
         expect(url.getPathSegments()).toEqual(['users', ':id', 'comments']);
         expect(url.getRelativePath()).toEqual(path_user_comments);
     });
+
+    test('should delete path segment by index', () => {
+        const url: UrlBuilder = new UrlBuilder().setPathSegments(['users', ':id', 'comments'], { id: 10 });
+        url.deletePathSegment(2);
+
+        expect(url.getRelativePath()).toEqual('/users/10');
+    })
 
     test('should add params', () => {
         const url: UrlBuilder = new UrlBuilder()
@@ -333,6 +341,12 @@ describe('UrlBuilder', () => {
         const url = new UrlBuilder().addPath(path_user_comments);
 
         expect(url.getLastPathSegment()).toBe('comments');
+    });
+
+    test('should get segment by index', () => {
+        const url = new UrlBuilder().addPath(path_user_comments);
+
+        expect(url.getPathSegment(1)).toBe('10');
     });
 
     test('should get parent', () => {
